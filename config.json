@@ -1,0 +1,17 @@
+{
+  "server" : {
+    "port" : "8089"
+  },
+  "browser" : {
+    "port" : "8080"
+  },
+  "data_source" : {
+    "driver_name": "mysql",
+    "host": "127.0.0.1",
+    "port": "3306",
+    "database": "vforum",
+    "username": "vforum",
+    "password": "feather0",
+    "charset": "utf8"
+}
+}

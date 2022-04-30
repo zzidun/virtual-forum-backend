@@ -32,7 +32,7 @@ func Auth_Middle() gin.HandlerFunc {
 
 		// 获取userid
 		user_id := claims.UserId
-		db := util.DB_Get()
+		db := model.DB_Get()
 		var user model.User
 		db.First(&user, user_id)
 

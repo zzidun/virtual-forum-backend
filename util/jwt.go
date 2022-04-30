@@ -7,7 +7,7 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
-var g_jwt_key = []byte("deep_dark_fantastic")
+var g_jwtKey = []byte("deep_dark_fantastic")
 
 type Claims struct {
 	UserId uint
@@ -27,7 +27,7 @@ func Token_Release(user *model.User) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	authorization, err := token.SignedString(g_jwt_key)
+	authorization, err := token.SignedString(g_jwtKey)
 
 	if err != nil {
 		return "", err
@@ -40,7 +40,7 @@ func Token_Parse(authorization string) (*jwt.Token, *Claims, error) {
 	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(authorization, claims, func(token *jwt.Token) (i interface{}, err error) {
-		return g_jwt_key, nil
+		return g_jwtKey, nil
 	})
 
 	return token, claims, err

@@ -10,7 +10,7 @@
     "host": "127.0.0.1",
     "port": "3306",
     "database": "vforum",
-    "username": "vforum",
+    "username": "zzidun",
     "password": "feather0",
     "charset": "utf8"
 }

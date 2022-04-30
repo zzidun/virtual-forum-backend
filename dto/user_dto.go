@@ -2,6 +2,9 @@ package dto
 
 import "zzidun.tech/vforum0/model"
 
+type SUser struct {
+}
+
 type User struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`

@@ -1,4 +1,8 @@
 {
+  "secret" : {
+    "key" : "deep_dark_fantastic",
+    "expire" : 8760
+  },
   "server" : {
     "port" : "8089"
   },
@@ -13,5 +17,5 @@
     "username": "zzidun",
     "password": "feather0",
     "charset": "utf8"
-}
+  }
 }

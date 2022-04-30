@@ -3,14 +3,14 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"zzidun.tech/vforum0/model"
+	"zzidun.tech/vforum0/dao"
 	"zzidun.tech/vforum0/router"
 	"zzidun.tech/vforum0/util"
 )
 
 func main() {
 	util.Config_Init()
-	model.DB_Init()
+	dao.DatabaseGet()
 	r := gin.Default()
 	r = router.RouteInit(r)
 	port := viper.GetString("server.port")

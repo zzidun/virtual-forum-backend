@@ -12,6 +12,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/sony/sonyflake v1.0.0
 	github.com/spf13/viper v1.9.0
 	github.com/ugorji/go v1.2.6 // indirect
 	go.uber.org/zap v1.21.0

@@ -6,6 +6,8 @@ type BannedIpv4 struct {
 	gorm.Model
 	LeftIp  string `gorm:"type:varchar(32);not null;unique"`
 	RightIp string `gorm:"type:varchar(32);not null;unique"`
+	User    *User
+	UserId  uint `gorm:"not null"`
 }
 
 type FailedUser struct {
@@ -14,8 +16,4 @@ type FailedUser struct {
 	FailedUser   *User
 	FailedUserId uint `gorm:"not null"`
 	trys         uint `gorm:"not null"`
-}
-
-type Report struct {
-	gorm.Model
 }

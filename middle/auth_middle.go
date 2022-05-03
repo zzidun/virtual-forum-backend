@@ -1,15 +1,6 @@
 package middle
 
-import (
-	"net/http"
-	"strings"
-
-	"github.com/gin-gonic/gin"
-	"zzidun.tech/vforum0/model"
-	"zzidun.tech/vforum0/response"
-	"zzidun.tech/vforum0/util"
-)
-
+/*
 func Auth_Middle() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// 获取authrization
@@ -48,3 +39,4 @@ func Auth_Middle() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
+*/

@@ -20,7 +20,7 @@ func RouteInit(r *gin.Engine) *gin.Engine {
 
 	//r.POST("/user/register", controller.User_Register)
 	//r.POST("/user/login", controller.User_Login)
-	r.GET("/user/info", middle.Auth_Middle(), controller.User_Info)
+	//r.GET("/user/info", middle.Auth_Middle(), controller.User_Info)
 
 	category_router := r.Group("/category")
 	category_controller := controller.Category_Controller_New()

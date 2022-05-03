@@ -32,32 +32,22 @@ func DatabaseInit() {
 
 	db.AutoMigrate(&model.Admin{})
 	db.AutoMigrate(&model.AdminGroup{})
-	db.AutoMigrate(&model.AdminGroupPerm{})
-	db.AutoMigrate(&model.AdminGroupMember{})
-	// db.AutoMigrate(&AdminOperator{})
 
 	db.AutoMigrate(&model.Category{})
 	db.AutoMigrate(&model.CategoryAdmin{})
-	db.AutoMigrate(&model.CategoryUser{})
 
 	db.AutoMigrate(&model.Post{})
 
 	db.AutoMigrate(&model.Comment{})
 	db.AutoMigrate(&model.CommentInfo{})
 
-	db.AutoMigrate(&model.UserInfo{})
+	db.AutoMigrate(&model.Post{})
 	db.AutoMigrate(&model.User{})
-	// db.AutoMigrate(&UserOperator{})
-	db.AutoMigrate(&model.UserBanned{})
-	db.AutoMigrate(&model.UserShield{})
-	db.AutoMigrate(&model.UserCollect{})
-	db.AutoMigrate(&model.UserFollow{})
-
 	db.AutoMigrate(&model.BannedIpv4{})
 	db.AutoMigrate(&model.FailedUser{})
-	db.AutoMigrate(&model.Report{})
-
-	db.AutoMigrate(&model.Message{})
+	db.AutoMigrate(&model.UserFollow{})
+	db.AutoMigrate(&model.UserShield{})
+	db.AutoMigrate(&model.UserCollect{})
 
 	gDatebase = db
 }

@@ -10,7 +10,7 @@ import (
 
 func main() {
 	util.Config_Init()
-	dao.DatabaseGet()
+	dao.DatabaseInit()
 	r := gin.Default()
 	r = router.RouteInit(r)
 	port := viper.GetString("server.port")

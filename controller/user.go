@@ -1,51 +1,42 @@
 package controller
 
 import (
-	"database/sql"
-	"errors"
-	"log"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"go.uber.org/zap"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
-	"zzidun.tech/vforum0/dao"
 	"zzidun.tech/vforum0/dto"
 	"zzidun.tech/vforum0/model"
 	"zzidun.tech/vforum0/response"
-	"zzidun.tech/vforum0/util"
 )
 
 func UserRegister(user *model.User) (err error) {
-	sqlStr := "select count(user_id) from user where username = ?"
-	var count int64
-	err = db.Get(&count, sqlStr, user.UserName)
-	if err != nil && err != sql.ErrNoRows {
-		return err
-	}
-	if count > 0 {
-		// 用户已存在
-		return ErrorUserExit
-	}
-	// 生成user_id
-	userID, err := snowflake.GetID()
-	if err != nil {
-		return ErrorGenIDFailed
-	}
-	// 生成加密密码
-	password := encryptPassword([]byte(user.Password))
-	// 把用户插入数据库
-	sqlStr = "insert into user(user_id, username, password) values (?,?,?)"
-	_, err = db.Exec(sqlStr, userID, user.UserName, password)
+	// sqlStr := "select count(user_id) from user where username = ?"
+	// var count int64
+	// err = db.Get(&count, sqlStr, user.UserName)
+	// if err != nil && err != sql.ErrNoRows {
+	// 	return err
+	// }
+	// if count > 0 {
+	// 	// 用户已存在
+	// 	return ErrorUserExit
+	// }
+	// // 生成user_id
+	// userID, err := snowflake.GetID()
+	// if err != nil {
+	// 	return ErrorGenIDFailed
+	// }
+	// // 生成加密密码
+	// password := encryptPassword([]byte(user.Password))
+	// // 把用户插入数据库
+	// sqlStr = "insert into user(user_id, username, password) values (?,?,?)"
+	// _, err = db.Exec(sqlStr, userID, user.UserName, password)
 	return
 }
 
+/*
 func SignUpHandler(c *gin.Context) {
 	// 1.获取请求参数 2.校验数据有效性
-	var fo *models.RegisterForm
+	var fo *model.RegisterForm
 	if err := c.ShouldBindJSON(&fo); err != nil {
 		// 请求参数有误，直接返回响应
 		zap.L().Error("SiginUp with invalid param", zap.Error(err))
@@ -53,11 +44,11 @@ func SignUpHandler(c *gin.Context) {
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
 			// 非validator.ValidationErrors类型错误直接返回
-			ResponseError(c, CodeInvalidParams) // 请求参数错误
+			response.ResponseError(c, response.CodeInvalidParams) // 请求参数错误
 			return
 		}
 		// validator.ValidationErrors类型错误则进行翻译
-		ResponseErrorWithMsg(c, CodeInvalidParams, removeTopStruct(errs.Translate(trans)))
+		response.ResponseErrorWithMsg(c, response.CodeInvalidParams, removeTopStruct(errs.Translate(trans)))
 		return // 翻译错误
 	}
 
@@ -79,10 +70,11 @@ func SignUpHandler(c *gin.Context) {
 	}
 	//返回响应
 	ResponseSuccess(c, nil)
-}
+}*/
 
+/*
 func User_Register(ctx *gin.Context) {
-	db := model.DB_Get()
+	db := util.DatabaseGet()
 
 	// 获取参数
 	var request_user = model.User{}
@@ -133,8 +125,9 @@ func User_Register(ctx *gin.Context) {
 	// 返回结果
 	response.Response_Success_Make(ctx, gin.H{"token": token}, "登陆成功")
 	return
-}
+}*/
 
+/*
 func User_Login(ctx *gin.Context) {
 	db := dao.DatabaseGet()
 
@@ -181,7 +174,7 @@ func User_Login(ctx *gin.Context) {
 	// 返回结果
 	response.Response_Success_Make(ctx, gin.H{"token": token}, "登陆成功")
 	return
-}
+}*/
 
 func User_Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
@@ -200,26 +193,26 @@ func Email_Exist(db *gorm.DB, email string) bool {
 }
 
 func UserCurrentIDGet(c *gin.Context) (userId uint, err error) {
-	_userType, ok := c.Get("userType")
-	if !ok {
-		err = ErrorUserNotLogin
-		return
-	}
-	userType, ok := _userType.(uint)
-	if !ok || userType != 0 {
-		err = ErrorUserNotLogin
-		return
-	}
+	// _userType, ok := c.Get("userType")
+	// if !ok {
+	// 	err = ErrorUserNotLogin
+	// 	return
+	// }
+	// userType, ok := _userType.(uint)
+	// if !ok || userType != 0 {
+	// 	err = ErrorUserNotLogin
+	// 	return
+	// }
 
-	_userId, ok := c.Get("userId")
-	if !ok {
-		err = ErrorUserNotLogin
-		return
-	}
-	userId, ok = _userId.(uint)
-	if !ok {
-		err = ErrorUserNotLogin
-		return
-	}
+	// _userId, ok := c.Get("userId")
+	// if !ok {
+	// 	err = ErrorUserNotLogin
+	// 	return
+	// }
+	// userId, ok = _userId.(uint)
+	// if !ok {
+	// 	err = ErrorUserNotLogin
+	// 	return
+	// }
 	return
 }

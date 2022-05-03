@@ -18,8 +18,8 @@ func UserRoute(r *gin.Engine) *gin.Engine {
 func RouteInit(r *gin.Engine) *gin.Engine {
 	r.Use(middle.Cors_Middle())
 
-	r.POST("/user/register", controller.User_Register)
-	r.POST("/user/login", controller.User_Login)
+	//r.POST("/user/register", controller.User_Register)
+	//r.POST("/user/login", controller.User_Login)
 	r.GET("/user/info", middle.Auth_Middle(), controller.User_Info)
 
 	category_router := r.Group("/category")

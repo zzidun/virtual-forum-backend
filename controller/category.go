@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"zzidun.tech/vforum0/dao"
 	"zzidun.tech/vforum0/model"
 	"zzidun.tech/vforum0/response"
 )
@@ -18,7 +19,7 @@ type Category_Controller struct {
 }
 
 func Category_Controller_New() ICategory_Controller {
-	db := model.DB_Get()
+	db := dao.DatabaseGet()
 
 	return Category_Controller{DB: db}
 }

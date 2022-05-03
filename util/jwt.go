@@ -10,7 +10,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"zzidun.tech/vforum0/controller"
+	"zzidun.tech/vforum0/response"
 )
 
 type Claims struct {
@@ -126,14 +126,14 @@ func JwtAuth() func(c *gin.Context) {
 		// 这里的具体实现方式要依据你的实际业务情况决定
 		authHeader := c.Request.Header.Get("Authorization")
 		if authHeader == "" {
-			controller.ResponseErrorWithMsg(c, controller.CodeInvalidToken, "请求头缺少Auth Token")
+			response.ResponseErrorWithMsg(c, response.CodeInvalidToken, "请求头缺少Auth Token")
 			c.Abort()
 			return
 		}
 		// 按空格分割
 		parts := strings.SplitN(authHeader, " ", 2)
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
-			controller.ResponseErrorWithMsg(c, controller.CodeInvalidToken, "Token格式不对")
+			response.ResponseErrorWithMsg(c, response.CodeInvalidToken, "Token格式不对")
 			c.Abort()
 			return
 		}
@@ -141,7 +141,7 @@ func JwtAuth() func(c *gin.Context) {
 		mc, err := TokenParse(parts[1])
 		if err != nil {
 			fmt.Println(err)
-			controller.ResponseError(c, controller.CodeInvalidToken)
+			response.ResponseError(c, response.CodeInvalidToken)
 			c.Abort()
 			return
 		}

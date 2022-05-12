@@ -47,8 +47,3 @@ type UserLoginForm struct {
 	Name     string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
-
-type UserAuthForm struct {
-	ID   string `json:"id" binding:"required"`
-	Name string `json:"name" binding:"required"`
-}

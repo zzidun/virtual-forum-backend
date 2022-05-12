@@ -47,3 +47,7 @@ func AdminLogin(ctx *gin.Context) {
 		"rtoken":    rtoken,
 	})
 }
+
+func AdminCreate(ctx *gin.Context) {
+	return
+}

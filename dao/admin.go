@@ -2,6 +2,7 @@ package dao
 
 import (
 	"errors"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 	"zzidun.tech/vforum0/model"
@@ -26,9 +27,26 @@ func AdminLogin(alform *model.AdminLoginForm) (id uint, err error) {
 }
 
 // 创建管理员，并且检查是否重复，加密密码
-func AdminCreate(alform *model.AdminLoginForm) (err error) {
+func AdminCreate(acform *model.AdminCreateForm) (err error) {
 
+	groupid, err := strconv.ParseUint(acform.GroupId, 10, 32)
+
+	password, err := bcrypt.GenerateFromPassword([]byte(acform.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// 组装用户对象
+	admin := model.Admin{
+		Name:     acform.Name,
+		Password: string(password),
+		GroupId:  uint(groupid),
+	}
+
+	db := DatabaseGet()
+	db.Create(admin)
 	return
+
 }
 
 func AdminDelete(admin *model.Admin) (err error) {
@@ -47,7 +65,17 @@ func AdminQueryById(admin *model.Admin) (err error) {
 	return
 }
 
-func AdmingroupCreate(admingroup *model.Admin) (err error) {
+func AdmingroupCreate(agcform *model.AdminGroupCreateForm) (err error) {
+
+	// 组装用户对象
+	admingroup := model.AdminGroup{
+		Name:         agcform.Name,
+		AdminPerm:    agcform.AdminPerm,
+		BanPerm:      agcform.BanPerm,
+		CategoryPerm: agcform.CategoryPerm,
+		PostPerm:     agcform.PostPerm,
+	}
+
 	db := DatabaseGet()
 	db.Create(admingroup)
 	return

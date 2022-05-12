@@ -7,34 +7,20 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
-func CheckUserExist(name string, email string) (error error) {
-	// sqlstr := `select count(user_id) from user where username = ?`
-	// var count int
-	// if err := gDatebase.Get(&count, sqlstr, username); err != nil {
-	// 	return err
-	// }
-	// if count > 0 {
-	// 	return errors.New("用户已存在")
-	// }
-	return
-}
-
 // 创建用户帐号，数据验证，加密密码
 func UserRegister(urform *model.UserRegisterForm) (err error) {
+
+	password, err := bcrypt.GenerateFromPassword([]byte(urform.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
 
 	// 组装用户对象
 	user := model.User{
 		Name:     urform.Name,
 		Email:    urform.Email,
-		Password: urform.Password,
+		Password: string(password),
 	}
-
-	password, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-
-	user.Password = string(password)
 
 	db := DatabaseGet()
 	db.Create(user)

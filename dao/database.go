@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"zzidun.tech/vforum0/model"
@@ -51,8 +52,47 @@ func DatabaseInit() {
 	db.AutoMigrate(&model.UserCollect{})
 
 	gDatebase = db
+
+	AdminInit()
 }
 
 func DatabaseGet() *gorm.DB {
 	return gDatebase
+}
+
+func AdminInit() {
+	db := DatabaseGet()
+
+	var admin model.Admin
+	var admingroup model.AdminGroup
+
+	acount := db.Find(&admin)
+	agcount := db.Find(&admingroup)
+
+	password, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	if err != nil {
+		return
+	}
+
+	if agcount.RowsAffected == 0 && acount.RowsAffected == 0 {
+		admingroup := model.AdminGroup{
+			Name:         "root",
+			AdminPerm:    true,
+			BanPerm:      true,
+			CategoryPerm: true,
+			PostPerm:     true,
+		}
+
+		admin := model.Admin{
+			Name:     "root",
+			Password: string(password),
+			GroupId:  1,
+		}
+
+		db.Create(&admingroup)
+		db.Create(&admin)
+	}
+
+	return
+
 }

@@ -1,26 +1,33 @@
 package dao
 
 import (
+	"errors"
+
 	"golang.org/x/crypto/bcrypt"
 	"zzidun.tech/vforum0/model"
 )
 
-func AdminLogin(admin *model.Admin) (err error) {
-	return
+func AdminLogin(alform *model.AdminLoginForm) (id uint, err error) {
+
+	var user model.Admin
+
+	db := DatabaseGet()
+	db.Where("name = ?", alform.Name).First(&user)
+	if user.ID == 0 {
+		return 0, errors.New("密码错误")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(alform.Password))
+	if err != nil {
+		return 0, errors.New("密码错误")
+	}
+
+	return user.ID, nil
 }
 
 // 创建管理员，并且检查是否重复，加密密码
-func AdminCreate(admin *model.Admin) (err error) {
+func AdminCreate(alform *model.AdminLoginForm) (err error) {
 
-	password, err := bcrypt.GenerateFromPassword([]byte(admin.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-
-	admin.Password = string(password)
-
-	db := DatabaseGet()
-	db.Create(admin)
 	return
 }
 

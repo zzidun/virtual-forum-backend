@@ -1,180 +1,85 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 
+	"zzidun.tech/vforum0/dao"
 	"zzidun.tech/vforum0/dto"
 	"zzidun.tech/vforum0/model"
 	"zzidun.tech/vforum0/response"
+	"zzidun.tech/vforum0/util"
 )
 
-func UserRegister(user *model.User) (err error) {
-	// sqlStr := "select count(user_id) from user where username = ?"
-	// var count int64
-	// err = db.Get(&count, sqlStr, user.UserName)
-	// if err != nil && err != sql.ErrNoRows {
-	// 	return err
-	// }
-	// if count > 0 {
-	// 	// 用户已存在
-	// 	return ErrorUserExit
-	// }
-	// // 生成user_id
-	// userID, err := snowflake.GetID()
-	// if err != nil {
-	// 	return ErrorGenIDFailed
-	// }
-	// // 生成加密密码
-	// password := encryptPassword([]byte(user.Password))
-	// // 把用户插入数据库
-	// sqlStr = "insert into user(user_id, username, password) values (?,?,?)"
-	// _, err = db.Exec(sqlStr, userID, user.UserName, password)
-	return
-}
+// 处理用户注册
+func UserRegister(ctx *gin.Context) {
 
-/*
-func SignUpHandler(c *gin.Context) {
-	// 1.获取请求参数 2.校验数据有效性
-	var fo *model.RegisterForm
-	if err := c.ShouldBindJSON(&fo); err != nil {
+	var urform *model.UserRegisterForm
+	if err := ctx.ShouldBindJSON(&urform); err != nil {
 		// 请求参数有误，直接返回响应
 		zap.L().Error("SiginUp with invalid param", zap.Error(err))
 		// 判断err是不是 validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
 			// 非validator.ValidationErrors类型错误直接返回
-			response.ResponseError(c, response.CodeInvalidParams) // 请求参数错误
+			response.ResponseError(ctx, response.CodeInvalidParams) // 请求参数错误
 			return
 		}
 		// validator.ValidationErrors类型错误则进行翻译
-		response.ResponseErrorWithMsg(c, response.CodeInvalidParams, removeTopStruct(errs.Translate(trans)))
-		return // 翻译错误
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, errs)
+		return
 	}
 
-	// 3.业务处理——注册用户
-	if err := logic.SignUp(fo); err != nil {
+	if err := dao.UserRegister(urform); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
-		if errors.Is(err, mysql.ErrorUserExit) {
-			ResponseError(c, CodeUserExist)
+
+		response.ResponseError(ctx, 100)
+		return
+	}
+
+	response.ResponseSuccess(ctx, nil)
+}
+
+// 处理用户登陆
+func UserLogin(ctx *gin.Context) {
+
+	var ulform *model.UserLoginForm
+	if err := ctx.ShouldBindJSON(&ulform); err != nil {
+		// 请求参数有误，直接返回响应
+		zap.L().Error("SiginUp with invalid param", zap.Error(err))
+		// 判断err是不是 validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// 非validator.ValidationErrors类型错误直接返回
+			response.ResponseError(ctx, response.CodeInvalidParams) // 请求参数错误
 			return
 		}
-		ResponseError(c, CodeServerBusy)
-		return
-
-		if err != nil {
-			zap.L().Error("mysql.Register() failed", zap.Error(err))
-			ResponseError(c, CodeServerBusy)
-			return
-		}
-	}
-	//返回响应
-	ResponseSuccess(c, nil)
-}*/
-
-/*
-func User_Register(ctx *gin.Context) {
-	db := util.DatabaseGet()
-
-	// 获取参数
-	var request_user = model.User{}
-	ctx.Bind(&request_user)
-	name := request_user.Name
-	email := request_user.Email
-	password := request_user.Password
-
-	// 数据验证
-	if len(name) == 0 {
-		name = util.String_Random(10)
-	}
-	if len(email) == 0 {
-		response.Response_Fail_Make(ctx, nil, "邮箱格式错误")
+		// validator.ValidationErrors类型错误则进行翻译
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, errs)
 		return
 	}
-	if len(password) < 6 {
-		response.Response_Fail_Make(ctx, nil, "密码必须不少于6位")
-		return
-	}
-	if Email_Exist(db, email) {
-		response.Response_Fail_Make(ctx, nil, "邮箱已被注册")
-		return
-	}
-	// 新建用户
-	password_mixed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	id, err := dao.UserLogin(ulform)
 	if err != nil {
-		response.Response_Make(ctx, http.StatusInternalServerError,
-			http.StatusInternalServerError, nil, "加密错误")
-		return
-	}
-	user := model.User{
-		Name:     name,
-		Email:    email,
-		Password: string(password_mixed),
-	}
-	db.Create(&user)
+		zap.L().Error("logic.Login failed", zap.String("username", ulform.Name), zap.Error(err))
 
-	// 发放token
-	token, err := util.Token_Release(&user)
-	if err != nil {
-		response.Response_Make(ctx, http.StatusInternalServerError,
-			http.StatusInternalServerError, nil, "系统异常")
-		log.Printf("token generate error : %v", err)
+		response.ResponseError(ctx, 100)
 		return
 	}
 
-	// 返回结果
-	response.Response_Success_Make(ctx, gin.H{"token": token}, "登陆成功")
-	return
-}*/
+	atoken, rtoken, err := util.TokenReleaseAccess(0, id, ulform.Name)
 
-/*
-func User_Login(ctx *gin.Context) {
-	db := dao.DatabaseGet()
-
-	// 获取参数
-	var request_user = model.User{}
-	ctx.Bind(&request_user)
-	email := request_user.Email
-	password := request_user.Password
-
-	// 数据验证
-	if len(email) == 0 {
-		response.Response_Fail_Make(ctx, nil, "邮箱格式错误")
-		return
-	}
-	if len(password) < 6 {
-		response.Response_Fail_Make(ctx, nil, "密码必须不少于6位")
-		return
-	}
-
-	// 判断邮箱是否存在
-	var user model.User
-	db.Where("email = ?", email).First(&user)
-	if user.ID == 0 {
-		response.Response_Fail_Make(ctx, nil, "邮箱未注册")
-		return
-	}
-
-	// 判断密码
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
-	if err != nil {
-		response.Response_Fail_Make(ctx, nil, "密码错误")
-		return
-	}
-
-	// 发放token
-	token, err := util.Token_Release(&user)
-	if err != nil {
-		response.Response_Make(ctx, http.StatusInternalServerError,
-			http.StatusInternalServerError, nil, "系统异常")
-		log.Printf("token generate error : %v", err)
-		return
-	}
-
-	// 返回结果
-	response.Response_Success_Make(ctx, gin.H{"token": token}, "登陆成功")
-	return
-}*/
+	response.ResponseSuccess(ctx, gin.H{
+		"user_id":   fmt.Sprintf("%d", id),
+		"user_name": ulform.Name,
+		"atoken":    atoken,
+		"rtoken":    rtoken,
+	})
+}
 
 func User_Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
@@ -190,29 +95,4 @@ func Email_Exist(db *gorm.DB, email string) bool {
 		return true
 	}
 	return false
-}
-
-func UserCurrentIDGet(c *gin.Context) (userId uint, err error) {
-	// _userType, ok := c.Get("userType")
-	// if !ok {
-	// 	err = ErrorUserNotLogin
-	// 	return
-	// }
-	// userType, ok := _userType.(uint)
-	// if !ok || userType != 0 {
-	// 	err = ErrorUserNotLogin
-	// 	return
-	// }
-
-	// _userId, ok := c.Get("userId")
-	// if !ok {
-	// 	err = ErrorUserNotLogin
-	// 	return
-	// }
-	// userId, ok = _userId.(uint)
-	// if !ok {
-	// 	err = ErrorUserNotLogin
-	// 	return
-	// }
-	return
 }

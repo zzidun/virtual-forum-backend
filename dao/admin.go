@@ -1,12 +1,24 @@
 package dao
 
-import "zzidun.tech/vforum0/model"
+import (
+	"golang.org/x/crypto/bcrypt"
+	"zzidun.tech/vforum0/model"
+)
 
 func AdminLogin(admin *model.Admin) (err error) {
 	return
 }
 
+// 创建管理员，并且检查是否重复，加密密码
 func AdminCreate(admin *model.Admin) (err error) {
+
+	password, err := bcrypt.GenerateFromPassword([]byte(admin.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	admin.Password = string(password)
+
 	db := DatabaseGet()
 	db.Create(admin)
 	return

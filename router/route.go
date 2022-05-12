@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
+	"zzidun.tech/vforum0/controller"
 	"zzidun.tech/vforum0/middle"
 	"zzidun.tech/vforum0/response"
 )
@@ -14,30 +15,30 @@ func slo(c *gin.Context) {
 // 需要验证管理员身份的路由
 func AdminRoute(r *gin.Engine) *gin.Engine {
 
-	r.POST("/adminlogin", slo)
+	r.POST("/adminlogin", controller.AdminLogin)
 
-	admin_router := r.Group("/admins")
+	admin_router := r.Group("/admins", middle.AuthMiddle())
 	admin_router.POST("", slo)
 	admin_router.DELETE("/:id", slo)
 	admin_router.PUT("/:id", slo)
 	admin_router.GET("/:id", slo)
 	admin_router.GET("", slo)
 
-	admingroup_router := r.Group("/admingroups")
+	admingroup_router := r.Group("/admingroups", middle.AuthMiddle())
 	admingroup_router.POST("", slo)
 	admingroup_router.DELETE("/:id", slo)
 	admingroup_router.PUT("/:id", slo)
 	admingroup_router.GET("/:id", slo)
 	admingroup_router.GET("", slo)
 
-	ban_router := r.Group("/bans")
+	ban_router := r.Group("/bans", middle.AuthMiddle())
 	ban_router.POST("", slo)
 	ban_router.DELETE("/:id", slo)
 	ban_router.PUT("/:id", slo)
 	ban_router.GET("/:id", slo)
 	ban_router.GET("", slo)
 
-	category_router := r.Group("/categories")
+	category_router := r.Group("/categories", middle.AuthMiddle())
 	category_router.POST("", slo)
 	category_router.DELETE("/:id", slo)
 	category_router.PUT("/:id", slo)
@@ -50,8 +51,8 @@ func AdminRoute(r *gin.Engine) *gin.Engine {
 // 需要验证用户身份的路由
 func UserRoute(r *gin.Engine) *gin.Engine {
 
-	r.POST("/register", slo)
-	r.POST("/login", slo)
+	r.POST("/register", controller.UserRegister)
+	r.POST("/login", controller.UserLogin)
 	r.POST("/post", slo)
 
 	return r
@@ -59,7 +60,8 @@ func UserRoute(r *gin.Engine) *gin.Engine {
 
 func RouteInit(r *gin.Engine) *gin.Engine {
 
-	r.Use(middle.Cors_Middle())
+	r.Use(middle.CorsMiddle())
+	r.Use(middle.BanMiddle())
 
 	r = AdminRoute(r)
 	r = UserRoute(r)

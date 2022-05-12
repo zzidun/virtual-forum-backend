@@ -37,8 +37,18 @@ type UserCollect struct {
 	PostId uint `gorm:"not null"`
 }
 
-type UserForm struct {
+type UserRegisterForm struct {
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binging:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type UserLoginForm struct {
 	Name     string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`
-	Email    string `json:"email" binging:"required"`
+}
+
+type UserAuthForm struct {
+	ID   string `json:"id" binding:"required"`
+	Name string `json:"name" binding:"required"`
 }

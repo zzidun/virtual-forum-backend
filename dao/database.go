@@ -12,6 +12,7 @@ import (
 
 var gDatebase *gorm.DB
 
+// 初始化数据库，建表
 func DatabaseInit() {
 
 	// driverName := viper.Get("database.driver_name")
@@ -34,7 +35,7 @@ func DatabaseInit() {
 	db.AutoMigrate(&model.AdminGroup{})
 
 	db.AutoMigrate(&model.Category{})
-	db.AutoMigrate(&model.CategoryAdmin{})
+	db.AutoMigrate(&model.Categoryer{})
 
 	db.AutoMigrate(&model.Post{})
 

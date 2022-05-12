@@ -15,5 +15,5 @@ type FailedUser struct {
 	FailedIp     string `gorm:"type:varchar(32);not null;unique"`
 	FailedUser   *User
 	FailedUserId uint `gorm:"not null"`
-	trys         uint `gorm:"not null"`
+	Trys         uint `gorm:"not null"`
 }

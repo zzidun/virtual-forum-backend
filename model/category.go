@@ -5,13 +5,13 @@ import "gorm.io/gorm"
 type Category struct {
 	gorm.Model
 	Name   string `gorm:"type:varchar(20);not null;unique"`
-	speak  uint   `gorm:"not null"`
-	follow uint   `gorm:"not null"`
-	wiki   *Post
-	wikiId uint `gorm:"not null"`
+	Speak  uint   `gorm:"not null"`
+	Follow uint   `gorm:"not null"`
+	Wiki   *Post
+	WikiId uint `gorm:"not null"`
 }
 
-type CategoryAdmin struct {
+type Categoryer struct {
 	gorm.Model
 	Category   *Category
 	CategoryId uint `gorm:"not null"`

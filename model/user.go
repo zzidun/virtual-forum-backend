@@ -9,7 +9,7 @@ type User struct {
 	Password      string `gorm:"size:255;not null"`
 	Signal        string `gorm:"size:255"`
 	LastLoginIpv4 string `gorm:"type:varchar(32);"`
-	speak         uint   `gorm:"not null"`
+	Speak         uint   `gorm:"not null"`
 }
 
 type UserFollow struct {
@@ -18,7 +18,7 @@ type UserFollow struct {
 	UserId     uint `gorm:"not null"`
 	Category   *Category
 	CategoryId uint `gorm:"not null"`
-	count      uint `gorm:"not null"`
+	Count      uint `gorm:"not null"`
 }
 
 type UserShield struct {

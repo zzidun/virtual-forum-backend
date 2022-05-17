@@ -78,3 +78,59 @@ func UserLogin(ctx *gin.Context) {
 		"rtoken":    rtoken,
 	})
 }
+
+func UserInfoQuery(ctx *gin.Context) {
+	return
+}
+
+func UserInfoUpdate(ctx *gin.Context) {
+	return
+}
+
+func UserShieldCreate(ctx *gin.Context) {
+	return
+}
+
+func UserShieldQuery(ctx *gin.Context) {
+	return
+}
+
+func UserShieldQueryById(ctx *gin.Context) {
+	return
+}
+
+func UserShieldDelete(ctx *gin.Context) {
+	return
+}
+
+func PostCollectCreate(ctx *gin.Context) {
+	return
+}
+
+func PostCollectQuery(ctx *gin.Context) {
+	return
+}
+
+func PostCollectQueryById(ctx *gin.Context) {
+	return
+}
+
+func PostCollectDelete(ctx *gin.Context) {
+	return
+}
+
+func CategoryFollowCreate(ctx *gin.Context) {
+	return
+}
+
+func CategoryFollowQuery(ctx *gin.Context) {
+	return
+}
+
+func CategoryFollowById(ctx *gin.Context) {
+	return
+}
+
+func CategoryFollowDelete(ctx *gin.Context) {
+	return
+}

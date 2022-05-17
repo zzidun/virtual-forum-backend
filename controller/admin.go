@@ -51,3 +51,19 @@ func AdminLogin(ctx *gin.Context) {
 func AdminCreate(ctx *gin.Context) {
 	return
 }
+
+func AdminDelete(ctx *gin.Context) {
+	return
+}
+
+func AdminUpdate(ctx *gin.Context) {
+	return
+}
+
+func AdminQuery(ctx *gin.Context) {
+	return
+}
+
+func AdminQueryById(ctx *gin.Context) {
+	return
+}

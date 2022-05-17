@@ -1,10 +1,10 @@
 package controller
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"zzidun.tech/vforum0/response"
+)
 
-type Rest_Contoller interface {
-	Insert(ctx *gin.Context)
-	Remove(ctx *gin.Context)
-	Update(ctx *gin.Context)
-	Query(ctx *gin.Context)
+func Slo(ctx *gin.Context) {
+	response.ResponseSuccess(ctx, gin.H{"msg": "slo called"})
 }

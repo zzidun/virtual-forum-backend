@@ -33,18 +33,19 @@ func AdminRoute(r *gin.Engine) *gin.Engine {
 	admingroup_router.GET("", controller.AdminGroupQuery)
 
 	ban_router := r.Group("/bans", middle.AuthMiddle(), middle.AdminCheckMiddle())
-	ban_router.POST("", controller.Slo)
-	ban_router.DELETE("/:id", controller.Slo)
-	ban_router.PUT("/:id", controller.Slo)
-	ban_router.GET("/:id", controller.Slo)
-	ban_router.GET("", controller.Slo)
+	ban_router.POST("", controller.BanCreate)
+	ban_router.DELETE("/:id", controller.BanDelete)
+	ban_router.PUT("/:id", controller.BanUpdate)
+	ban_router.GET("/:id", controller.BanQueryById)
+	ban_router.GET("", controller.BanQuery)
 
 	category_router := r.Group("/categories", middle.AuthMiddle(), middle.AdminCheckMiddle())
 	category_router.POST("", controller.CategoryCreate)
 	category_router.DELETE("/:id", controller.CategoryDelete)
 	category_router.PUT("/:id", controller.CategoryerSet)
-	category_router.GET("/:id", controller.CategoryQuery)
-	category_router.GET("", controller.CategoryQueryById)
+
+	r.GET("fails", controller.FailQuery)
+	r.GET("fails/:id", controller.FailQueryById)
 
 	return r
 }

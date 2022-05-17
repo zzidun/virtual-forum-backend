@@ -8,7 +8,7 @@ type Category struct {
 	Speak  uint   `gorm:"not null"`
 	Follow uint   `gorm:"not null"`
 	Wiki   *Post
-	WikiId uint `gorm:"not null"`
+	WikiId uint
 }
 
 type Categoryer struct {

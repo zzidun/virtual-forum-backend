@@ -8,20 +8,26 @@ import (
 	"zzidun.tech/vforum0/response"
 )
 
-func slo(c *gin.Context) {
-	response.ResponseSuccess(c, gin.H{"msg": "slo called"})
+func slo(ctx *gin.Context) {
+	response.ResponseSuccess(ctx, gin.H{"msg": "slo called"})
 }
 
 // 需要验证管理员身份的路由
 func AdminRoute(r *gin.Engine) *gin.Engine {
 
+	// 管理员登陆
 	r.POST("/adminlogin", controller.AdminLogin)
 
 	admin_router := r.Group("/admins", middle.AuthMiddle())
+	// 创建管理员
 	admin_router.POST("", slo)
+	// 删除管理员
 	admin_router.DELETE("/:id", slo)
+	// 修改管理员组别和密码
 	admin_router.PUT("/:id", slo)
+	// 获取当个管理员信息
 	admin_router.GET("/:id", slo)
+	// 获取管理员列表
 	admin_router.GET("", slo)
 
 	admingroup_router := r.Group("/admingroups", middle.AuthMiddle())
@@ -48,10 +54,21 @@ func AdminRoute(r *gin.Engine) *gin.Engine {
 	return r
 }
 
+func ViewRouter(r *gin.Engine) *gin.Engine {
+	// 获取版块列表
+	r.GET("/categories")
+	// 按id获取版块信息
+	r.GET("/categories/:id")
+
+	return r
+}
+
 // 需要验证用户身份的路由
 func UserRoute(r *gin.Engine) *gin.Engine {
 
+	// 用户注册
 	r.POST("/register", controller.UserRegister)
+	// 用户登陆
 	r.POST("/login", controller.UserLogin)
 	r.POST("/post", slo)
 

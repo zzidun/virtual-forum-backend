@@ -59,6 +59,16 @@ func ViewRouter(r *gin.Engine) *gin.Engine {
 	r.GET("/categories")
 	// 按id获取版块信息
 	r.GET("/categories/:id")
+	// 获取版块帖子列表
+	r.GET("/posts")
+	// 按id获取帖子信息
+	r.GET("/posts/:id")
+	// 获取评论列表
+	r.GET("/comments")
+	// 获取评论信息
+	r.GET("/comments/:id")
+	// 获取用户信息
+	r.GET("/user:id")
 
 	return r
 }
@@ -70,7 +80,31 @@ func UserRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/register", controller.UserRegister)
 	// 用户登陆
 	r.POST("/login", controller.UserLogin)
-	r.POST("/post", slo)
+	// 发布帖子
+	r.POST("/posts")
+	// 删除帖子
+	r.DELETE("/posts/:id")
+	// 发布评论
+	r.POST("/comments")
+	// 删除评论
+	r.DELETE("/comments/:id")
+	// 编辑用户信息
+	r.PUT("/users/:id")
+	// 屏蔽用户
+	r.PUT("/shields")
+	r.GET("/shields")
+	r.GET("/shields/:id")
+	r.DELETE("/shields/:id")
+	// 收藏帖子
+	r.PUT("/collects")
+	r.GET("/collects")
+	r.GET("/collects/:id")
+	r.DELETE("/collects/:id")
+	// 关注版块
+	r.PUT("/follows")
+	r.GET("/follows")
+	r.GET("/follows/:id")
+	r.DELETE("/follows/:id")
 
 	return r
 }
@@ -81,14 +115,8 @@ func RouteInit(r *gin.Engine) *gin.Engine {
 	r.Use(middle.BanMiddle())
 
 	r = AdminRoute(r)
+	r = ViewRouter(r)
 	r = UserRoute(r)
-
-	// category_router := r.Group("/category")
-	// category_controller := controller.Category_Controller_New()
-	// category_router.POST("", category_controller.Insert)
-	// category_router.PUT("/:id", category_controller.Update)
-	// category_router.GET("/:id", category_controller.Query)
-	// category_router.DELETE("/:id", category_controller.Remove)
 
 	return r
 }

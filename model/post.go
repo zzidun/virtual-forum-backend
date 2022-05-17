@@ -11,3 +11,9 @@ type Post struct {
 	User       *User
 	UserId     uint `gorm:"not null"`
 }
+
+type PostPostForm struct {
+	CategoryId string `json:"categoryid" binding:"required"`
+	Title      string `json:"title" binding:"required"`
+	UserId     string `json:"userid" binding:"required"`
+}

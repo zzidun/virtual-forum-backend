@@ -48,7 +48,7 @@ func AdminCheckMiddle() func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 
 		user_type, exist := ctx.Get("userType")
-		if !exist || user_type != 1 {
+		if !exist || user_type.(uint) != 1 {
 			response.ResponseErrorWithMsg(ctx, response.CodeInvalidToken, "请重新登陆")
 			return
 		}

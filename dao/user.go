@@ -8,7 +8,7 @@ import (
 )
 
 // 创建用户帐号，数据验证，加密密码
-func UserRegister(urform *model.UserRegisterForm) (err error) {
+func UserCreate(urform *model.UserRegisterForm) (err error) {
 
 	password, err := bcrypt.GenerateFromPassword([]byte(urform.Password), bcrypt.DefaultCost)
 	if err != nil {

@@ -18,7 +18,7 @@ func CategoryCreate(ctx *gin.Context) (err error) {
 	return
 }
 
-func CategoryerSet(ctx *gin.Context) (err error) {
+func CategoryerSet() (err error) {
 	categoryer := model.Categoryer{
 		CategoryId: 0,
 		UserId:     0,
@@ -29,4 +29,16 @@ func CategoryerSet(ctx *gin.Context) (err error) {
 	db.Create(categoryer)
 
 	return
+}
+
+func CategoryUpdate() {
+
+}
+
+func CategoryQuery() {
+
+}
+
+func CategoryQueryById() {
+
 }

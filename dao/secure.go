@@ -1,7 +1,17 @@
 package dao
 
-import "github.com/gin-gonic/gin"
+func BanCreate() {
+	return
+}
 
-func BanCreate(ctx *gin.Context) {
+func BanDelete() {
+	return
+}
+
+func BanQuery() {
+	return
+}
+
+func BanQueryById() {
 	return
 }

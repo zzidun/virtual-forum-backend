@@ -34,15 +34,11 @@ func DatabaseInit() {
 
 	db.AutoMigrate(&model.Admin{})
 	db.AutoMigrate(&model.AdminGroup{})
-
 	db.AutoMigrate(&model.Category{})
 	db.AutoMigrate(&model.Categoryer{})
-
 	db.AutoMigrate(&model.Post{})
-
 	db.AutoMigrate(&model.Comment{})
 	db.AutoMigrate(&model.CommentInfo{})
-
 	db.AutoMigrate(&model.Post{})
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.BannedIpv4{})
@@ -63,11 +59,8 @@ func DatabaseGet() *gorm.DB {
 func AdminInit() {
 	db := DatabaseGet()
 
-	var admin model.Admin
-	var admingroup model.AdminGroup
-
-	acount := db.Find(&admin)
-	agcount := db.Find(&admingroup)
+	acount := db.Find(&model.Admin{})
+	agcount := db.Find(&model.AdminGroup{})
 
 	password, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
 	if err != nil {

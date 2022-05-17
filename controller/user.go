@@ -32,7 +32,7 @@ func UserRegister(ctx *gin.Context) {
 		return
 	}
 
-	if err := dao.UserRegister(urform); err != nil {
+	if err := dao.UserCreate(urform); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
 		response.ResponseError(ctx, 100)

@@ -65,8 +65,13 @@ func CategoryDelete(categoryId uint) (err error) {
 	return
 }
 
-func CategoryQuery() {
-
+func CategoryQuery() (category []model.Category, err error) {
+	db := DatabaseGet()
+	
+	if db.Find(&category).Error != nil {
+		err = ErrorQueryFailed
+	}
+	return
 }
 
 func CategoryQueryById(categoryId uint) (category model.Category, err error) {

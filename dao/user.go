@@ -61,3 +61,21 @@ func UserLogin(ulform *model.UserLoginForm) (id uint, err error) {
 	id = user.ID
 	return
 }
+
+func UserQueryById(userId uint) (user model.User, err error) {
+
+	db := DatabaseGet()
+	count := db.Where("id = ?", userId).Find(&user)
+
+	if count.Error != nil {
+		zap.L().Error("query user failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		err = ErrorNotExistFailed
+		return
+	}
+
+	return user, nil
+}

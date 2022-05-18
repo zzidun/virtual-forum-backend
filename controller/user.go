@@ -61,7 +61,7 @@ func UserLogin(ctx *gin.Context) {
 		return
 	}
 
-	id, err := dao.UserLogin(ulform)
+	userId, err := dao.UserLogin(ulform)
 	if err != nil {
 		zap.L().Error("logic.Login failed", zap.String("username", ulform.Name), zap.Error(err))
 
@@ -69,10 +69,12 @@ func UserLogin(ctx *gin.Context) {
 		return
 	}
 
-	token, err := util.TokenRelease(0, id, ulform.Name)
+	token, err := util.TokenRelease(0, userId, ulform.Name)
+
+	dao.UserUpdateLoginIpv4(userId, ctx.ClientIP())
 
 	response.ResponseSuccess(ctx, gin.H{
-		"user_id":   fmt.Sprintf("%d", id),
+		"user_id":   fmt.Sprintf("%d", userId),
 		"user_name": ulform.Name,
 		"token":    token,
 	})

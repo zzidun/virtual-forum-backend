@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 	"zzidun.tech/vforum0/dao"
+	"zzidun.tech/vforum0/logic"
 	"zzidun.tech/vforum0/model"
 	"zzidun.tech/vforum0/response"
 )
@@ -53,7 +54,13 @@ func CategoryDelete(ctx *gin.Context) {
 }
 
 func CategoryQuery(ctx *gin.Context) {
-	return
+	categoryList, err := logic.CategoryList()
+	if err != nil {
+		response.Response(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, categoryList)
 }
 
 func CategoryQueryById(ctx *gin.Context) {

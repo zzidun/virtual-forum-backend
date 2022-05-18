@@ -50,3 +50,27 @@ func CategoryerCancel(categoryerId uint) (err error) {
 
 	return
 }
+
+// 查询版块的大版主,返回id
+func CategoryerQueryByCategoryId(categoryId uint) (userId uint, err error) {
+
+	db := DatabaseGet()
+
+	var categoryer model.Categoryer
+
+	count := db.Where("id = ? AND admin_type = ?", categoryId, true).Find(&categoryer)
+
+	if count.Error != nil {
+		zap.L().Error("query categoryer failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		userId = 0
+		return
+	}
+
+	userId = categoryer.UserId
+
+	return
+}

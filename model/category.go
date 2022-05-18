@@ -25,7 +25,7 @@ type CategoryCreateForm struct {
 }
 
 type CategoryListEnrty struct {
-	Id         string `json:"name" binding:"required"`
+	Id         string `json:"id" binding:"required"`
 	Name       string `json:"name" binding:"required"`
 	Speak      string `json:"speak" binding:"required"`
 	Follow     string `json:"follow" binding:"required"`

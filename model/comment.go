@@ -18,3 +18,10 @@ type CommentPostForm struct {
 	ReplyId string `json:"replyid"`
 	Content string `json:"content" binding:"required"`
 }
+
+type CommentListEnrty struct {
+	Id       string `json:"id" binding:"required"`
+	UserName string `json:"username" binding:"required"`
+	ReplyId  string `json:"replyId" binding:"required"`
+	Content  string `json:"content" binding:"required"`
+}

@@ -17,3 +17,10 @@ type PostPostForm struct {
 	Title      string `json:"title" binding:"required"`
 	UserId     string `json:"userid" binding:"required"`
 }
+
+type PostListEntry struct {
+	Id       string `json:"id" binding:"required"`
+	Title    string `json:"name" binding:"required"`
+	Speak    string `json:"speak" binding:"required"`
+	UserName string `json:"username" binding:"required"`
+}

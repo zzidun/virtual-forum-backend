@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"zzidun.tech/vforum0/dao"
+	"zzidun.tech/vforum0/logic"
 	"zzidun.tech/vforum0/model"
 	"zzidun.tech/vforum0/response"
 )
@@ -50,7 +51,15 @@ func PostDelete(ctx *gin.Context) {
 }
 
 func PostQuery(ctx *gin.Context) {
-	return
+
+	categoryId := 1
+	postList, err := logic.PostList(categoryId)
+	if err != nil {
+		response.Response(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, postList)
 }
 
 func PostQueryById(ctx *gin.Context) {

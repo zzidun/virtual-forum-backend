@@ -61,7 +61,15 @@ func CommentDelete(ctx *gin.Context) {
 }
 
 func CommentQuery(ctx *gin.Context) {
-	return
+
+	categoryId := 1
+	commentList, err := logic.CommentList(categoryId)
+	if err != nil {
+		response.Response(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, commentList)
 }
 
 func CommentQueryById(ctx *gin.Context) {

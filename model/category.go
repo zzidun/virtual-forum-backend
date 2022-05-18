@@ -23,3 +23,8 @@ type Categoryer struct {
 type CategoryCreateForm struct {
 	Name string `json:"name" binding:"required"`
 }
+
+type CategoryListEnrty struct {
+	Name string `json:"name" binding:"required"`
+	
+}

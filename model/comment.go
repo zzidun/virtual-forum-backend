@@ -8,7 +8,6 @@ type Comment struct {
 	PostId  uint `gorm:"not null"`
 	User    *User
 	UserId  uint `gorm:"not null"`
-	Reply   *Comment
 	ReplyId uint
 	Content string `gorm:"type:text;not null"`
 }

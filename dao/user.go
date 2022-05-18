@@ -1,8 +1,7 @@
 package dao
 
 import (
-	"errors"
-
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"zzidun.tech/vforum0/model"
 )
@@ -12,7 +11,9 @@ func UserCreate(urform *model.UserRegisterForm) (err error) {
 
 	password, err := bcrypt.GenerateFromPassword([]byte(urform.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		zap.L().Error("gen password failed", zap.Error(err))
+		err = ErrorPasswordWrong
+		return
 	}
 
 	// 组装用户对象
@@ -23,7 +24,13 @@ func UserCreate(urform *model.UserRegisterForm) (err error) {
 	}
 
 	db := DatabaseGet()
-	db.Create(user)
+	if err = db.Create(&user).Error; err != nil {
+		db.Rollback()
+		zap.L().Error("insert user failed", zap.Error(err))
+		err = ErrorInsertFailed
+		return
+	}
+
 	return
 }
 
@@ -32,15 +39,25 @@ func UserLogin(ulform *model.UserLoginForm) (id uint, err error) {
 	var user model.User
 
 	db := DatabaseGet()
-	db.Where("name = ?", ulform.Name).First(&user)
-	if user.ID == 0 {
-		return 0, errors.New("密码错误")
+	count := db.Where("name = ?", ulform.Name).Find(&user)
+
+	if count.Error != nil {
+		zap.L().Error("query user failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		err = ErrorUserNotExit
+		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(ulform.Password))
 	if err != nil {
-		return 0, errors.New("密码错误")
+		zap.L().Error("compare password failed", zap.Error(err))
+		err = ErrorPasswordWrong
+		return
 	}
 
-	return user.ID, nil
+	id = user.ID
+	return
 }

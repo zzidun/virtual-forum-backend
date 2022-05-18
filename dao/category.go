@@ -1,27 +1,33 @@
 package dao
 
 import (
-	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"zzidun.tech/vforum0/model"
 )
 
-func CategoryCreate(ctx *gin.Context) (err error) {
+func CategoryCreate(categoryName string) (err error) {
 	category := model.Category{
-		Name:   "name",
+		Name:   categoryName,
 		Speak:  0,
 		Follow: 0,
 	}
 
 	db := DatabaseGet()
-	db.Create(category)
+
+	if err = db.Create(&category).Error; err != nil {
+		db.Rollback()
+		zap.L().Error("insert category failed", zap.Error(err))
+		err = ErrorInsertFailed
+		return
+	}
 
 	return
 }
 
-func CategoryerSet() (err error) {
+func CategoryerUpdate(categoryId uint, userId uint) (err error) {
 	categoryer := model.Categoryer{
-		CategoryId: 0,
-		UserId:     0,
+		CategoryId: categoryId,
+		UserId:     userId,
 		AdminType:  true,
 	}
 
@@ -29,10 +35,6 @@ func CategoryerSet() (err error) {
 	db.Create(categoryer)
 
 	return
-}
-
-func CategoryUpdate() {
-
 }
 
 func CategoryQuery() {

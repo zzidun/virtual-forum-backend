@@ -13,6 +13,9 @@ const (
 	CodeInvalidToken      ResponseCode = 1006
 	CodeInvalidAuthFormat ResponseCode = 1007
 	CodeNotLogin          ResponseCode = 1008
+
+	CodeInvalidRequestFormat ResponseCode = 2000
+	CodeUnknownError         ResponseCode = 9999
 )
 
 var msgFlags = map[ResponseCode]string{
@@ -26,6 +29,9 @@ var msgFlags = map[ResponseCode]string{
 	CodeInvalidToken:      "无效的Token",
 	CodeInvalidAuthFormat: "认证格式有误",
 	CodeNotLogin:          "未登录",
+
+	CodeInvalidRequestFormat: "请求报文格式错误",
+	CodeUnknownError:         "未知错误类型",
 }
 
 func (c ResponseCode) Msg() string {

@@ -2,10 +2,12 @@ package controller
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
+	"zzidun.tech/vforum0/dao"
 	"zzidun.tech/vforum0/model"
 	"zzidun.tech/vforum0/response"
 )
@@ -38,12 +40,19 @@ func PostPost(ctx *gin.Context) {
 		return
 	}
 
-	// if err := dao.PostCreate(ppform); err != nil {
-	// 	zap.L().Error("logic.signup failed", zap.Error(err))
+	categoryId, err := strconv.ParseUint(ppform.CategoryId, 10, 32)
+	if err != nil {
+		zap.L().Error("SiginUp with invalid param", zap.Error(err))
+		return
+	}
+	userId, err := strconv.ParseUint(ppform.UserId, 10, 32)
 
-	// 	response.ResponseError(ctx, 100)
-	// 	return
-	// }
+	if err := dao.PostCreate(uint(categoryId), ppform.Title, uint(userId)); err != nil {
+		zap.L().Error("logic.signup failed", zap.Error(err))
+
+		response.ResponseError(ctx, 100)
+		return
+	}
 
 	return
 }

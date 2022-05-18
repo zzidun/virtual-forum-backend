@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"zzidun.tech/vforum0/model"
 )
@@ -49,11 +50,63 @@ func AdminCreate(acform *model.AdminCreateForm) (err error) {
 
 }
 
-func AdminDelete(admin *model.Admin) (err error) {
+func AdminDelete(adminId uint) (err error) {
+
+	db := DatabaseGet()
+
+	var admin model.Admin
+
+	count := db.Where("id = ?", adminId).Find(&admin)
+
+	if count.Error != nil {
+		zap.L().Error("query admin failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		zap.L().Error("query admin failed", zap.Error(err))
+		err = ErrorNotExistFailed
+		return
+	}
+
+	if err = db.Delete(&admin).Error; err != nil {
+		zap.L().Error("delelte admin failed", zap.Error(err))
+		err = ErrorDeleteFailed
+		return
+	}
+
 	return
 }
 
-func AdminChange(admin *model.Admin) (err error) {
+func AdminChangeGroup(adminId uint, groupId uint) (err error) {
+	db := DatabaseGet()
+
+	var admin model.Admin
+
+	count := db.Where("id = ?", adminId).Find(&admin)
+
+	if count.Error != nil {
+		zap.L().Error("query admin failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		zap.L().Error("query admin failed", zap.Error(err))
+		err = ErrorNotExistFailed
+		return
+	}
+
+	if err = db.Model(&admin).Update("group_id", groupId).Error; err != nil {
+		db.Rollback()
+		zap.L().Error("update userFollow failed", zap.Error(err))
+		err = ErrorInsertFailed
+		return
+	}
+
+	return
+}
+
+func AdminChangePassword(adminId uint, oldPassword string, newPassword string) (err error) {
 	return
 }
 

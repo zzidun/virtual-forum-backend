@@ -38,7 +38,6 @@ func DatabaseInit() {
 	db.AutoMigrate(&model.Categoryer{})
 	db.AutoMigrate(&model.Post{})
 	db.AutoMigrate(&model.Comment{})
-	db.AutoMigrate(&model.CommentInfo{})
 	db.AutoMigrate(&model.Post{})
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.BannedIpv4{})

@@ -30,7 +30,7 @@ func UserFollowCreate(userId uint, categoryId uint) (err error) {
 			return
 		}
 	} else {
-		if err = db.Unscoped().Model(&count).Update("deleted_at", nil).Error; err != nil {
+		if err = db.Unscoped().Model(&follow).Update("deleted_at", nil).Error; err != nil {
 			db.Rollback()
 			zap.L().Error("update userFollow failed", zap.Error(err))
 			err = ErrorInsertFailed

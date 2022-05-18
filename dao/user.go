@@ -47,7 +47,7 @@ func UserLogin(ulform *model.UserLoginForm) (id uint, err error) {
 		return
 	}
 	if count.RowsAffected == 0 {
-		err = ErrorUserNotExit
+		err = ErrorNotExistFailed
 		return
 	}
 

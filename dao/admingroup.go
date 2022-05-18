@@ -1,6 +1,9 @@
 package dao
 
-import "zzidun.tech/vforum0/model"
+import (
+	"go.uber.org/zap"
+	"zzidun.tech/vforum0/model"
+)
 
 func AdmingroupCreate(agcform *model.AdminGroupCreateForm) (err error) {
 
@@ -30,6 +33,22 @@ func AdmingroupQuery(admin *model.Admin) (err error) {
 	return
 }
 
-func AdmingroupQueryById(admin *model.Admin) (err error) {
+func AdmingroupQueryById(admingroupId uint) (admingroup model.AdminGroup, err error) {
+
+	db := DatabaseGet()
+
+	count := db.Where("id = ?", admingroupId).Find(&admingroup)
+
+	if count.Error != nil {
+		zap.L().Error("query admingroup failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		zap.L().Error("query admingroup failed", zap.Error(err))
+		err = ErrorExistFailed
+		return
+	}
+
 	return
 }

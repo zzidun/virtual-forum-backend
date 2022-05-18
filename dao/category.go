@@ -37,10 +37,39 @@ func CategoryerUpdate(categoryId uint, userId uint) (err error) {
 	return
 }
 
+func CategoryDelete(categoryId uint) (err error) {
+
+	db := DatabaseGet()
+
+	var category model.Category
+
+	count := db.Where("id = ?", categoryId).Find(&category)
+
+	if count.Error != nil {
+		zap.L().Error("query category failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		zap.L().Error("query category failed", zap.Error(err))
+		err = ErrorNotExistFailed
+		return
+	}
+
+	if err = db.Delete(&category).Error; err != nil {
+		zap.L().Error("delelte category failed", zap.Error(err))
+		err = ErrorDeleteFailed
+		return
+	}
+
+	return
+}
+
 func CategoryQuery() {
 
 }
 
 func CategoryQueryById(categoryId uint) (category model.Category, err error) {
+
 	return
 }

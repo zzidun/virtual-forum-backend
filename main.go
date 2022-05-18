@@ -9,6 +9,8 @@ import (
 )
 
 func main() {
+	// 不取消注释,将会是Debug模式
+	// gin.SetMode(gin.ReleaseMode)
 	util.Config_Init()
 	dao.DatabaseInit()
 	r := gin.Default()

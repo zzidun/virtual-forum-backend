@@ -67,7 +67,7 @@ func CategoryDelete(categoryId uint) (err error) {
 
 func CategoryQuery() (category []model.Category, err error) {
 	db := DatabaseGet()
-	
+
 	if db.Find(&category).Error != nil {
 		err = ErrorQueryFailed
 	}
@@ -76,5 +76,19 @@ func CategoryQuery() (category []model.Category, err error) {
 
 func CategoryQueryById(categoryId uint) (category model.Category, err error) {
 
+	db := DatabaseGet()
+
+	count := db.Where("id = ?", categoryId).Find(&category)
+
+	if count.Error != nil {
+		zap.L().Error("query category failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		zap.L().Error("query category failed", zap.Error(err))
+		err = ErrorNotExistFailed
+		return
+	}
 	return
 }

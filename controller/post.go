@@ -12,12 +12,14 @@ import (
 	"zzidun.tech/vforum0/response"
 )
 
+// 发布文章
 func PostPost(ctx *gin.Context) {
 
 	user_id, exist := ctx.Get("userId")
 	if !exist {
 		return
 	}
+	fmt.Println(user_id.(uint))
 
 	var ppform *model.PostPostForm
 	if err := ctx.ShouldBindJSON(&ppform); err != nil {
@@ -35,22 +37,21 @@ func PostPost(ctx *gin.Context) {
 		return
 	}
 
-	if fmt.Sprintf("%d", user_id.(uint)) != ppform.UserId {
-		response.ResponseError(ctx, 100)
-		return
-	}
-
 	categoryId, err := strconv.ParseUint(ppform.CategoryId, 10, 32)
 	if err != nil {
 		zap.L().Error("SiginUp with invalid param", zap.Error(err))
 		return
 	}
 	userId, err := strconv.ParseUint(ppform.UserId, 10, 32)
+	if err != nil {
+		zap.L().Error("SiginUp with invalid param", zap.Error(err))
+		return
+	}
 
 	if err := dao.PostCreate(uint(categoryId), ppform.Title, uint(userId)); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
-		response.ResponseError(ctx, 100)
+		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
 
@@ -58,6 +59,7 @@ func PostPost(ctx *gin.Context) {
 }
 
 func PostDelete(ctx *gin.Context) {
+
 	return
 }
 

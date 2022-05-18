@@ -49,7 +49,7 @@ func AdminCheckMiddle() func(ctx *gin.Context) {
 
 		user_type, exist := ctx.Get("userType")
 		if !exist || user_type.(uint) != 1 {
-			response.ResponseErrorWithMsg(ctx, response.CodeInvalidToken, "请重新登陆")
+			response.ResponseErrorWithMsg(ctx, response.CodeInvalidToken, "请重新登陆管理员帐号")
 			return
 		}
 
@@ -57,13 +57,13 @@ func AdminCheckMiddle() func(ctx *gin.Context) {
 	}
 }
 
-// 管理员权限检测中间件
+// 用户权限检测中间件
 func UserCheckMiddle() func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 
 		user_type, exist := ctx.Get("userType")
-		if !exist || user_type != 0 {
-			response.ResponseErrorWithMsg(ctx, response.CodeInvalidToken, "请重新登陆")
+		if !exist || user_type.(uint) != 0 {
+			response.ResponseErrorWithMsg(ctx, response.CodeInvalidToken, "请重新登陆用户帐号")
 			return
 		}
 

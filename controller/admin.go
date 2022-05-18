@@ -12,6 +12,42 @@ import (
 	"zzidun.tech/vforum0/util"
 )
 
+type AdminPermCode int64
+
+const (
+	CodeAdminPerm    AdminPermCode = 1000
+	CodeBanPerm      AdminPermCode = 1001
+	CodeCategoryPerm AdminPermCode = 1002
+	CodePostPerm     AdminPermCode = 1003
+)
+
+func AdminCheckPerm(adminId uint, code AdminPermCode) (valid bool, err error) {
+	admin, err := dao.AdminQueryById(adminId)
+	if err != nil {
+		return false, err
+	}
+
+	admingroup, err := dao.AdmingroupQueryById(admin.GroupId)
+	if err != nil {
+		return false, err
+	}
+
+	switch code {
+	case CodeAdminPerm:
+		valid = admingroup.AdminPerm
+	case CodeBanPerm:
+		valid = admingroup.BanPerm
+	case CodeCategoryPerm:
+		valid = admingroup.CategoryPerm
+	case CodePostPerm:
+		valid = admingroup.PostPerm
+	default:
+		return false, nil
+	}
+
+	return
+}
+
 func AdminLogin(ctx *gin.Context) {
 
 	var alform *model.AdminLoginForm
@@ -34,17 +70,16 @@ func AdminLogin(ctx *gin.Context) {
 	if err != nil {
 		zap.L().Error("logic.Login failed", zap.String("username", alform.Name), zap.Error(err))
 
-		response.ResponseError(ctx, 100)
+		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
 
-	atoken, rtoken, err := util.TokenReleaseAccess(1, id, alform.Name)
+	token, err := util.TokenRelease(1, id, alform.Name)
 
 	response.ResponseSuccess(ctx, gin.H{
 		"user_id":   fmt.Sprintf("%d", id),
 		"user_name": alform.Name,
-		"atoken":    atoken,
-		"rtoken":    rtoken,
+		"token":     token,
 	})
 }
 

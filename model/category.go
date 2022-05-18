@@ -19,3 +19,7 @@ type Categoryer struct {
 	UserId     uint `gorm:"not null"`
 	AdminType  bool `gorm:"type:bool;not null"`
 }
+
+type CategoryCreateForm struct {
+	Name string `json:"name" binding:"required"`
+}

@@ -35,7 +35,7 @@ func UserRegister(ctx *gin.Context) {
 	if err := dao.UserCreate(urform); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
-		response.ResponseError(ctx, 100)
+		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
 
@@ -65,17 +65,16 @@ func UserLogin(ctx *gin.Context) {
 	if err != nil {
 		zap.L().Error("logic.Login failed", zap.String("username", ulform.Name), zap.Error(err))
 
-		response.ResponseError(ctx, 100)
+		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
 
-	atoken, rtoken, err := util.TokenReleaseAccess(0, id, ulform.Name)
+	token, err := util.TokenRelease(0, id, ulform.Name)
 
 	response.ResponseSuccess(ctx, gin.H{
 		"user_id":   fmt.Sprintf("%d", id),
 		"user_name": ulform.Name,
-		"atoken":    atoken,
-		"rtoken":    rtoken,
+		"token":    token,
 	})
 }
 

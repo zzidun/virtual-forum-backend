@@ -114,6 +114,21 @@ func AdminQuery(admin *model.Admin) (err error) {
 	return
 }
 
-func AdminQueryById(admin *model.Admin) (err error) {
+func AdminQueryById(adminId uint) (admin model.Admin, err error) {
+	db := DatabaseGet()
+
+	count := db.Where("id = ?", adminId).Find(&admin)
+
+	if count.Error != nil {
+		zap.L().Error("query category failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		zap.L().Error("query category failed", zap.Error(err))
+		err = ErrorNotExistFailed
+		return
+	}
+
 	return
 }

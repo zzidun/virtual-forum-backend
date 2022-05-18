@@ -1,4 +1,4 @@
-package service
+package logic
 
 func UserLoginRecord() {
 	return

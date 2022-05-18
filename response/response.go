@@ -12,6 +12,15 @@ type ResponseData struct {
 	Data    interface{}  `json:"data,omitempty"` // omitempty当data为空时,不展示这个字段
 }
 
+func Response(ctx *gin.Context, c ResponseCode, data interface{}) {
+	rd := &ResponseData{
+		Code:    c,
+		Message: c.Msg(),
+		Data:    data,
+	}
+	ctx.JSON(http.StatusOK, rd)
+}
+
 func ResponseError(ctx *gin.Context, c ResponseCode) {
 	rd := &ResponseData{
 		Code:    c,

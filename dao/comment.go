@@ -1,6 +1,6 @@
 package dao
 
-func CommentCreate() (err error) {
+func CommentCreate(postId uint, userId uint, replyId uint, comment string) (err error) {
 	return
 }
 

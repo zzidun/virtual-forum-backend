@@ -4,7 +4,7 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
-func PostCreate(ppform *model.PostPostForm) (err error) {
+func PostCreate(categoryId uint, title string, userId uint) (err error) {
 	return
 }
 

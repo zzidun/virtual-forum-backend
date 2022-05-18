@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
-	"zzidun.tech/vforum0/dao"
 	"zzidun.tech/vforum0/model"
 	"zzidun.tech/vforum0/response"
 )
@@ -39,12 +38,12 @@ func PostPost(ctx *gin.Context) {
 		return
 	}
 
-	if err := dao.PostCreate(ppform); err != nil {
-		zap.L().Error("logic.signup failed", zap.Error(err))
+	// if err := dao.PostCreate(ppform); err != nil {
+	// 	zap.L().Error("logic.signup failed", zap.Error(err))
 
-		response.ResponseError(ctx, 100)
-		return
-	}
+	// 	response.ResponseError(ctx, 100)
+	// 	return
+	// }
 
 	return
 }

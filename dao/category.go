@@ -41,6 +41,6 @@ func CategoryQuery() {
 
 }
 
-func CategoryQueryById() {
-
+func CategoryQueryById(categoryId uint) (category model.Category, err error) {
+	return
 }

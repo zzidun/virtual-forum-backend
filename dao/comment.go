@@ -61,7 +61,7 @@ func CommentQueryById(commentId uint) (err error) {
 	return
 }
 
-func CommentQueryByPostId(portId uint) (commentList []model.Post, err error) {
+func CommentQueryByPostId(portId uint) (commentList []model.Comment, err error) {
 	db := DatabaseGet()
 
 	if db.Where("post_id = ?", portId).Find(&commentList).Error != nil {

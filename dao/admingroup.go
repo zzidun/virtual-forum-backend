@@ -5,6 +5,23 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
+func AdminGroupReapetCheck(name string) (err error) {
+	db := DatabaseGet()
+	count := db.Where("name = ?", name).Find(&model.AdminGroup{})
+
+	if count.Error != nil {
+		zap.L().Error("query admingroup failed", zap.Error(count.Error))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected != 0 {
+		err = ErrorExistFailed
+		return
+	}
+
+	return
+}
+
 func AdmingroupCreate(agcform *model.AdminGroupCreateForm) (err error) {
 
 	// 组装用户对象
@@ -14,6 +31,11 @@ func AdmingroupCreate(agcform *model.AdminGroupCreateForm) (err error) {
 		BanPerm:      agcform.BanPerm,
 		CategoryPerm: agcform.CategoryPerm,
 		PostPerm:     agcform.PostPerm,
+	}
+
+	if err = AdminReapetCheck(admingroup.Name); err != nil {
+		zap.L().Error("insert user failed", zap.Error(err))
+		return
 	}
 
 	db := DatabaseGet()

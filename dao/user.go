@@ -6,6 +6,25 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
+func UserReapetCheck(name string, email string) (err error) {
+	db := DatabaseGet()
+	count1 := db.Where("name = ?", name).Find(&model.User{})
+	count2 := db.Where("email = ?", email).Find(&model.User{})
+
+	if count1.Error != nil || count2.Error != nil {
+		zap.L().Error("query user failed", zap.Error(count1.Error))
+		zap.L().Error("query user failed", zap.Error(count2.Error))
+		err = ErrorQueryFailed
+		return
+	}
+	if count1.RowsAffected != 0 || count2.RowsAffected != 0 {
+		err = ErrorExistFailed
+		return
+	}
+
+	return
+}
+
 // 创建用户帐号，数据验证，加密密码
 func UserCreate(urform *model.UserRegisterForm) (err error) {
 
@@ -21,6 +40,11 @@ func UserCreate(urform *model.UserRegisterForm) (err error) {
 		Name:     urform.Name,
 		Email:    urform.Email,
 		Password: string(password),
+	}
+
+	if err = UserReapetCheck(user.Name, user.Email); err != nil {
+		zap.L().Error("insert user failed", zap.Error(err))
+		return
 	}
 
 	db := DatabaseGet()
@@ -42,7 +66,7 @@ func UserLogin(ulform *model.UserLoginForm) (id uint, err error) {
 	count := db.Where("name = ?", ulform.Name).Find(&user)
 
 	if count.Error != nil {
-		zap.L().Error("query user failed", zap.Error(err))
+		zap.L().Error("query user failed", zap.Error(count.Error))
 		err = ErrorQueryFailed
 		return
 	}

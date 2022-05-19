@@ -23,7 +23,7 @@ func CommentList(postId uint) (commentList []*gin.H, err error) {
 		commentList = append(commentList, &gin.H{
 			"id":       fmt.Sprintf("%d", comment.ID),
 			"username": user.Name,
-			"replyid":  fmt.Sprintf("%d", comment.Speak),
+			"replyid":  fmt.Sprintf("%d", comment.ReplyId),
 			"content":  comment.Content,
 		})
 	}

@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
@@ -54,7 +56,19 @@ func CategoryDelete(ctx *gin.Context) {
 }
 
 func CategoryQuery(ctx *gin.Context) {
-	categoryList, err := logic.CategoryList()
+	leftStr := ctx.Query("left")
+	rightStr := ctx.Query("right")
+
+	left, err := strconv.ParseInt(leftStr, 10, 32)
+	if err != nil {
+		left = 1
+	}
+	right, err := strconv.ParseInt(rightStr, 10, 32)
+	if err != nil {
+		right = 16
+	}
+
+	categoryList, err := logic.CategoryList(uint(left), uint(right))
 	if err != nil {
 		response.Response(ctx, response.CodeUnknownError, nil)
 		return

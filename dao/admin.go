@@ -27,6 +27,23 @@ func AdminLogin(alform *model.AdminLoginForm) (id uint, err error) {
 	return user.ID, nil
 }
 
+func AdminReapetCheck(name string) (err error) {
+	db := DatabaseGet()
+	count := db.Where("name = ?", name).Find(&model.Admin{})
+
+	if count.Error != nil {
+		zap.L().Error("query admin failed", zap.Error(count.Error))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected != 0 {
+		err = ErrorExistFailed
+		return
+	}
+
+	return
+}
+
 // 创建管理员，并且检查是否重复，加密密码
 func AdminCreate(acform *model.AdminCreateForm) (err error) {
 
@@ -42,6 +59,11 @@ func AdminCreate(acform *model.AdminCreateForm) (err error) {
 		Name:     acform.Name,
 		Password: string(password),
 		GroupId:  uint(groupid),
+	}
+
+	if err = AdminReapetCheck(admin.Name); err != nil {
+		zap.L().Error("insert user failed", zap.Error(err))
+		return
 	}
 
 	db := DatabaseGet()

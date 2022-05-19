@@ -53,7 +53,7 @@ func PostDelete(ctx *gin.Context) {
 func PostQuery(ctx *gin.Context) {
 
 	categoryId := 1
-	postList, err := logic.PostList(categoryId)
+	postList, err := logic.PostList(uint(categoryId))
 	if err != nil {
 		response.Response(ctx, response.CodeUnknownError, nil)
 		return

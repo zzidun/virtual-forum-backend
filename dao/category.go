@@ -5,11 +5,33 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
-func CategoryCreate(categoryName string) (err error) {
+func CategoryReapetCheck(name string) (err error) {
+	db := DatabaseGet()
+	count := db.Where("name = ?", name).Find(&model.Category{})
+
+	if count.Error != nil {
+		zap.L().Error("query category failed", zap.Error(count.Error))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected != 0 {
+		err = ErrorExistFailed
+		return
+	}
+
+	return
+}
+
+func CategoryCreate(name string) (err error) {
 	category := model.Category{
-		Name:   categoryName,
+		Name:   name,
 		Speak:  0,
 		Follow: 0,
+	}
+
+	if err = CategoryReapetCheck(category.Name); err != nil {
+		zap.L().Error("insert user failed", zap.Error(err))
+		return
 	}
 
 	db := DatabaseGet()
@@ -65,10 +87,10 @@ func CategoryDelete(categoryId uint) (err error) {
 	return
 }
 
-func CategoryQuery() (category []model.Category, err error) {
+func CategoryQuery(left uint, right uint) (category []model.Category, err error) {
 	db := DatabaseGet()
 
-	if db.Find(&category).Error != nil {
+	if db.Limit(int(left)).Offset(int(right-left)).Find(&category).Error != nil {
 		err = ErrorQueryFailed
 	}
 	return

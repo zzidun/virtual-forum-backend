@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"zzidun.tech/vforum0/dao"
+	"zzidun.tech/vforum0/logic"
 	"zzidun.tech/vforum0/model"
 	"zzidun.tech/vforum0/response"
 )
@@ -63,7 +64,7 @@ func CommentDelete(ctx *gin.Context) {
 func CommentQuery(ctx *gin.Context) {
 
 	categoryId := 1
-	commentList, err := logic.CommentList(categoryId)
+	commentList, err := logic.CommentList(uint(categoryId))
 	if err != nil {
 		response.Response(ctx, response.CodeUnknownError, nil)
 		return

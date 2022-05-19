@@ -19,6 +19,11 @@ type CommentPostForm struct {
 	Content string `json:"content" binding:"required"`
 }
 
+type CommentDeleteForm struct {
+	CommentId  string `json:"commentid" binding:"required"`
+	UserId  string `json:"userid" binding:"required"`
+}
+
 type CommentListRequired struct {
 	PostId string `json:"postid" binding:"required"`
 	Left   string `json:"left" binding:"required"`

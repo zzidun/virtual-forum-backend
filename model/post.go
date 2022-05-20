@@ -27,7 +27,6 @@ type PostListRequired struct {
 	CategoryId string `json:"categoryid" binding:"required"`
 	Left       string `json:"left" binding:"required"`
 	Right      string `json:"right" binding:"required"`
-	Sort       string `json:"sort" binding:"required"`
 }
 
 type PostListEntry struct {

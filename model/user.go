@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Name          string `gorm:"type:varchar(20);not null;unique"`
-	Email         string `gorm:"type:varchar(50);not null;unique"`
+	Name          string `gorm:"type:varchar(20);not null;unique;uniqueIndex"`
+	Email         string `gorm:"type:varchar(50);not null;unique;uniqueIndex"`
 	Password      string `gorm:"size:255;not null"`
 	Signal        string `gorm:"size:255"`
 	LastLoginIpv4 string `gorm:"type:varchar(32);"`

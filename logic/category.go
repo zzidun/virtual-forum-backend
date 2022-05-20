@@ -7,7 +7,7 @@ import (
 	"zzidun.tech/vforum0/dao"
 )
 
-func CategoryList(left uint, right uint) (categoryList []*gin.H, err error) {
+func CategoryList(left int, right int) (categoryList []*gin.H, err error) {
 	categorys, err := dao.CategoryQuery(left, right)
 	if err != nil {
 		return

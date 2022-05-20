@@ -52,10 +52,10 @@ func PostDelete(postId uint) (err error) {
 	return
 }
 
-func PostQueryByCategoryId(categoryId uint) (postList []model.Post, err error) {
+func PostQueryByCategoryId(categoryId uint, left int, right int) (postList []model.Post, err error) {
 	db := DatabaseGet()
 
-	if db.Where("category_id = ?", categoryId).Find(&postList).Error != nil {
+	if db.Where("category_id = ?", categoryId).Limit(right-left).Offset(left).Find(&postList).Error != nil {
 		err = ErrorQueryFailed
 	}
 	return

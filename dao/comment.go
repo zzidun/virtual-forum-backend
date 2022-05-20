@@ -61,10 +61,10 @@ func CommentQueryById(commentId uint) (err error) {
 	return
 }
 
-func CommentQueryByPostId(portId uint) (commentList []model.Comment, err error) {
+func CommentQueryByPostId(portId uint, left int, right int) (commentList []model.Comment, err error) {
 	db := DatabaseGet()
 
-	if db.Where("post_id = ?", portId).Find(&commentList).Error != nil {
+	if db.Where("post_id = ?", portId).Limit(right-left).Offset(left).Find(&commentList).Error != nil {
 		err = ErrorQueryFailed
 	}
 	return

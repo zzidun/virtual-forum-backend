@@ -87,10 +87,10 @@ func CategoryDelete(categoryId uint) (err error) {
 	return
 }
 
-func CategoryQuery(left uint, right uint) (category []model.Category, err error) {
+func CategoryQuery(left int, right int) (category []model.Category, err error) {
 	db := DatabaseGet()
 
-	if db.Limit(int(left)).Offset(int(right-left)).Find(&category).Error != nil {
+	if db.Limit(right-left).Offset(left).Find(&category).Error != nil {
 		err = ErrorQueryFailed
 	}
 	return

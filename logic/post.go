@@ -7,8 +7,8 @@ import (
 	"zzidun.tech/vforum0/dao"
 )
 
-func PostList(categoryId uint) (PostList []*gin.H, err error) {
-	posts, err := dao.PostQueryByCategoryId(categoryId)
+func PostList(categoryId uint, left int, right int) (PostList []*gin.H, err error) {
+	posts, err := dao.PostQueryByCategoryId(categoryId, left, right)
 	if err != nil {
 		return
 	}
@@ -21,10 +21,10 @@ func PostList(categoryId uint) (PostList []*gin.H, err error) {
 		}
 
 		PostList = append(PostList, &gin.H{
-			"id":         fmt.Sprintf("%d", post.ID),
-			"title":      post.Title,
-			"speak":      fmt.Sprintf("%d", post.Speak),
-			"categoryer": user.Name,
+			"id":    fmt.Sprintf("%d", post.ID),
+			"title": post.Title,
+			"speak": fmt.Sprintf("%d", post.Speak),
+			"user":  user.Name,
 		})
 	}
 

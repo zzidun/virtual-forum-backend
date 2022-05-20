@@ -17,5 +17,6 @@
     "username": "zzidun",
     "password": "feather0",
     "charset": "utf8"
-  }
+  },
+  "about" : "# virutal forum 论坛正式版 \r\n 如有bug或建议可以发完作者邮箱或者反馈版块 \r\n 项目仓库:[前端](https://github.com/zzidun/virtual-forum-frontend-0), [后端](https://github.com/zzidun/virtual-forum-endback-0)"
 }

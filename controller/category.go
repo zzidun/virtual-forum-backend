@@ -56,19 +56,33 @@ func CategoryDelete(ctx *gin.Context) {
 }
 
 func CategoryQuery(ctx *gin.Context) {
-	leftStr := ctx.Query("left")
-	rightStr := ctx.Query("right")
 
-	left, err := strconv.ParseInt(leftStr, 10, 32)
+	var clRequired *model.CategoryListRequired
+	if err := ctx.ShouldBindJSON(&clRequired); err != nil {
+		// 请求参数有误，直接返回响应
+		zap.L().Error("SiginUp with invalid param", zap.Error(err))
+		// 判断err是不是 validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// 非validator.ValidationErrors类型错误直接返回
+			response.ResponseError(ctx, response.CodeInvalidParams) // 请求参数错误
+			return
+		}
+
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, errs)
+		return
+	}
+
+	left, err := strconv.ParseInt(clRequired.Left, 10, 32)
 	if err != nil {
 		left = 1
 	}
-	right, err := strconv.ParseInt(rightStr, 10, 32)
+	right, err := strconv.ParseInt(clRequired.Right, 10, 32)
 	if err != nil {
 		right = 16
 	}
 
-	categoryList, err := logic.CategoryList(uint(left), uint(right))
+	categoryList, err := logic.CategoryList(int(left), int(right))
 	if err != nil {
 		response.Response(ctx, response.CodeUnknownError, nil)
 		return

@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Category struct {
 	gorm.Model
-	Name   string `gorm:"type:varchar(20);not null;unique"`
+	Name   string `gorm:"type:varchar(20);not null;unique;uniqueIndex"`
 	Speak  uint   `gorm:"not null"`
 	Follow uint   `gorm:"not null"`
 	Wiki   *Post
@@ -26,6 +26,11 @@ type CategoryCreateForm struct {
 
 type CategoryDeleteForm struct {
 	CategoryId string `json:"categoryid" binding:"required"`
+}
+
+type CategoryListRequired struct {
+	Left  string `json:"left" binding:"required"`
+	Right string `json:"right" binding:"required"`
 }
 
 type CategoryListEnrty struct {

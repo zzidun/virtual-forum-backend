@@ -7,8 +7,8 @@ import (
 	"zzidun.tech/vforum0/dao"
 )
 
-func CommentList(postId uint) (commentList []*gin.H, err error) {
-	comments, err := dao.CommentQueryByPostId(postId)
+func CommentList(postId uint, left int, right int) (commentList []*gin.H, err error) {
+	comments, err := dao.CommentQueryByPostId(postId, left, right)
 	if err != nil {
 		return
 	}

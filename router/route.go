@@ -51,12 +51,16 @@ func AdminRoute(r *gin.Engine) *gin.Engine {
 }
 
 func ViewRouter(r *gin.Engine) *gin.Engine {
+	// 获取论坛首页
+	r.GET("/about", controller.About)
 	// 获取版块列表
 	r.GET("/categories", controller.CategoryQuery)
 	// 按id获取版块信息
 	r.GET("/categories/:id", controller.CategoryQueryById)
 	// 获取版块帖子列表
 	r.GET("/posts", controller.PostQuery)
+	// 获取版块帖子列表
+	r.GET("/posts2", controller.PostQueryReplyTime)
 	// 按id获取帖子信息
 	r.GET("/posts/:id", controller.PostQueryById)
 	// 获取评论列表

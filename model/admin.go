@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 //管理员实体
 type Admin struct {
 	gorm.Model
-	Name     string `gorm:"type:varchar(20);not null;unique"`
+	Name     string `gorm:"type:varchar(20);not null;unique;uniqueIndex"`
 	Password string `gorm:"size:255;not null"`
 	Group    *AdminGroup
 	GroupId  uint `gorm:"not null"`
@@ -13,7 +13,7 @@ type Admin struct {
 
 type AdminGroup struct {
 	gorm.Model
-	Name         string `gorm:"type:varchar(20);not null;unique"`
+	Name         string `gorm:"type:varchar(20);not null;unique;uniqueIndex"`
 	AdminPerm    bool   `gorm:"type:bool;not null"`
 	BanPerm      bool   `gorm:"type:bool;not null"`
 	CategoryPerm bool   `gorm:"type:bool;not null"`

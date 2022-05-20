@@ -7,11 +7,13 @@ import (
 	"zzidun.tech/vforum0/dao"
 )
 
-func CategoryList(left int, right int) (categoryList []*gin.H, err error) {
-	categorys, err := dao.CategoryQuery(left, right)
+func CategoryList(left int, right int) (categoryList *gin.H, err error) {
+	categorys, totNum, curNum, err := dao.CategoryQuery(left, right)
 	if err != nil {
 		return
 	}
+
+	var categoryListData []*gin.H
 
 	for _, category := range categorys {
 
@@ -29,13 +31,19 @@ func CategoryList(left int, right int) (categoryList []*gin.H, err error) {
 			userName = user.Name
 		}
 
-		categoryList = append(categoryList, &gin.H{
+		categoryListData = append(categoryListData, &gin.H{
 			"id":         fmt.Sprintf("%d", category.ID),
 			"name":       category.Name,
 			"speak":      fmt.Sprintf("%d", category.Speak),
 			"follow":     fmt.Sprintf("%d", category.Follow),
 			"categoryer": userName,
 		})
+	}
+
+	categoryList = &gin.H{
+		"tot":  fmt.Sprintf("%d", totNum),
+		"cur":  fmt.Sprintf("%d", curNum),
+		"list": categoryListData,
 	}
 
 	return

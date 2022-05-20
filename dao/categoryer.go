@@ -5,11 +5,11 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
-func CategoryerSet(categoryId uint, userId uint, adminType bool) (err error) {
+func CategoryerSet(categoryId uint, userId uint, categoryType uint) (err error) {
 	categoryer := model.Categoryer{
 		CategoryId: categoryId,
 		UserId:     userId,
-		AdminType:  adminType,
+		Type:       categoryType,
 	}
 
 	db := DatabaseGet()
@@ -58,7 +58,7 @@ func CategoryerQueryByCategoryId(categoryId uint) (userId uint, err error) {
 
 	var categoryer model.Categoryer
 
-	count := db.Where("id = ? AND admin_type = ?", categoryId, true).Find(&categoryer)
+	count := db.Where("id = ? AND type = ?", categoryId, 1).Find(&categoryer)
 
 	if count.Error != nil {
 		zap.L().Error("query categoryer failed", zap.Error(err))

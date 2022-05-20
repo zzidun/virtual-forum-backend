@@ -11,6 +11,7 @@ func AdminGroupDelete(ctx *gin.Context) {
 }
 
 func AdminGroupUpdate(ctx *gin.Context) {
+	
 	return
 }
 

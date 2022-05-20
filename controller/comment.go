@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 	"zzidun.tech/vforum0/dao"
 	"zzidun.tech/vforum0/logic"
@@ -64,34 +64,25 @@ func CommentDelete(ctx *gin.Context) {
 
 func CommentQuery(ctx *gin.Context) {
 
-	var clRequired *model.CommentListRequired
-	if err := ctx.ShouldBindJSON(&clRequired); err != nil {
-		// 请求参数有误，直接返回响应
-		zap.L().Error("SiginUp with invalid param", zap.Error(err))
-		// 判断err是不是 validator.ValidationErrors类型的errors
-		errs, ok := err.(validator.ValidationErrors)
-		if !ok {
-			// 非validator.ValidationErrors类型错误直接返回
-			response.ResponseError(ctx, response.CodeInvalidParams) // 请求参数错误
-			return
-		}
+	leftStr := ctx.Query("left")
+	rightStr := ctx.Query("right")
+	postIdStr := ctx.Query("post")
 
-		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, errs)
+	left, err := strconv.ParseInt(leftStr, 10, 32)
+	if err != nil {
+		response.Response(ctx, response.CodeUnknownError, nil)
+		return
+	}
+	right, err := strconv.ParseInt(rightStr, 10, 32)
+	if err != nil {
+		response.Response(ctx, response.CodeUnknownError, nil)
 		return
 	}
 
-	left, err := strconv.ParseInt(clRequired.Left, 10, 32)
+	postId, err := strconv.ParseInt(postIdStr, 10, 32)
 	if err != nil {
-		left = 1
-	}
-	right, err := strconv.ParseInt(clRequired.Right, 10, 32)
-	if err != nil {
-		right = 16
-	}
-
-	postId, err := strconv.ParseInt(clRequired.PostId, 10, 32)
-	if err != nil {
-		right = 16
+		response.Response(ctx, response.CodeUnknownError, nil)
+		return
 	}
 
 	commentList, err := logic.CommentList(uint(postId), int(left), int(right))
@@ -99,6 +90,8 @@ func CommentQuery(ctx *gin.Context) {
 		response.Response(ctx, response.CodeUnknownError, nil)
 		return
 	}
+
+	fmt.Println(left, right, postId)
 
 	response.Response(ctx, response.CodeSuccess, commentList)
 }

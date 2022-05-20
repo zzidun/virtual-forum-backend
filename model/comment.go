@@ -24,12 +24,6 @@ type CommentDeleteForm struct {
 	UserId  string `json:"userid" binding:"required"`
 }
 
-type CommentListRequired struct {
-	PostId string `json:"postid" binding:"required"`
-	Left   string `json:"left" binding:"required"`
-	Right  string `json:"right" binding:"required"`
-}
-
 type CommentListEnrty struct {
 	Id       string `json:"id" binding:"required"`
 	UserName string `json:"username" binding:"required"`

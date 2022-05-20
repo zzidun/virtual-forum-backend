@@ -45,6 +45,17 @@ func UserFollowDelete(userFollowId uint) (err error) {
 	return
 }
 
-func UserFollow(userId uint) (err error) {
+func UserFollowQuery(userId uint, categoryId uint) (userFollow model.UserFollow, err error) {
+	var follow model.UserFollow
+
+	db := DatabaseGet()
+	count := db.Where("user_id = ? AND category_id = ?", userId, categoryId).Find(&follow)
+
+	if count.Error != nil {
+		zap.L().Error("query userFollow failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+
 	return
 }

@@ -50,7 +50,7 @@ func CategoryerUpdate(categoryId uint, userId uint) (err error) {
 	categoryer := model.Categoryer{
 		CategoryId: categoryId,
 		UserId:     userId,
-		AdminType:  true,
+		Type:       1,
 	}
 
 	db := DatabaseGet()
@@ -87,12 +87,17 @@ func CategoryDelete(categoryId uint) (err error) {
 	return
 }
 
-func CategoryQuery(left int, right int) (category []model.Category, err error) {
+func CategoryQuery(left int, right int) (category []model.Category, totNum int64, curNum int64, err error) {
 	db := DatabaseGet()
 
-	if db.Limit(right-left).Offset(left).Find(&category).Error != nil {
+	count := db.Limit(right - left).Offset(left).Find(&category)
+
+	if count.Error != nil {
 		err = ErrorQueryFailed
 	}
+	curNum = count.RowsAffected
+	db.Model(&model.Category{}).Count(&totNum)
+
 	return
 }
 

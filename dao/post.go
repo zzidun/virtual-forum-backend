@@ -52,12 +52,17 @@ func PostDelete(postId uint) (err error) {
 	return
 }
 
-func PostQueryByCategoryId(categoryId uint, left int, right int) (postList []model.Post, err error) {
+func PostQueryByCategoryId(categoryId uint, left int, right int) (postList []model.Post, totNum int64, curNum int64, err error) {
 	db := DatabaseGet()
 
-	if db.Where("category_id = ?", categoryId).Limit(right-left).Offset(left).Find(&postList).Error != nil {
+	count := db.Where("category_id = ?", categoryId).Limit(right - left).Offset(left).Find(&postList)
+
+	if count.Error != nil {
 		err = ErrorQueryFailed
 	}
+	curNum = count.RowsAffected
+	db.Model(&model.Post{}).Count(&totNum)
+
 	return
 }
 

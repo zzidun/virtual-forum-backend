@@ -17,7 +17,7 @@ type Categoryer struct {
 	CategoryId uint `gorm:"not null"`
 	User       *User
 	UserId     uint `gorm:"not null"`
-	AdminType  bool `gorm:"type:bool;not null"`
+	Type       uint `gorm:"type:bool;not null"`
 }
 
 type CategoryCreateForm struct {
@@ -28,15 +28,15 @@ type CategoryDeleteForm struct {
 	CategoryId string `json:"categoryid" binding:"required"`
 }
 
-type CategoryListRequired struct {
-	Left  string `json:"left" binding:"required"`
-	Right string `json:"right" binding:"required"`
-}
-
 type CategoryListEnrty struct {
 	Id         string `json:"id" binding:"required"`
 	Name       string `json:"name" binding:"required"`
 	Speak      string `json:"speak" binding:"required"`
 	Follow     string `json:"follow" binding:"required"`
 	Categoryer string `json:"categoryer" binding:"required"`
+}
+
+type CategoryerForm struct {
+	UserId     string `json:"userid" binding:"required"`
+	Type       string `json:"type" binding:"required"`
 }

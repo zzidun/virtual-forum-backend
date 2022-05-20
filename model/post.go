@@ -23,12 +23,6 @@ type PostDeleteForm struct {
 	UserId string `json:"userid" binding:"required"`
 }
 
-type PostListRequired struct {
-	CategoryId string `json:"categoryid" binding:"required"`
-	Left       string `json:"left" binding:"required"`
-	Right      string `json:"right" binding:"required"`
-}
-
 type PostListEntry struct {
 	Id       string `json:"id" binding:"required"`
 	Title    string `json:"name" binding:"required"`

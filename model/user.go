@@ -58,3 +58,8 @@ type UserUpdateForm struct {
 	Password string `json:"password" binding:"required"`
 	Signal   string `json:"signal" binding:"required"`
 }
+
+type UserShieldForm struct {
+	UserId      string `json:"userid1" binding:"required"`
+	ShielUserId string `json:"userid2" binding:"required"`
+}

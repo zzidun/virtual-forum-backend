@@ -52,23 +52,23 @@ func AdminRoute(r *gin.Engine) *gin.Engine {
 
 func ViewRouter(r *gin.Engine) *gin.Engine {
 	// 获取论坛首页
-	r.GET("/about", middle.AuthMiddle(), controller.About)
+	r.GET("/about", middle.IdMiddle(), controller.About)
 	// 获取版块列表
-	r.GET("/categories", middle.AuthMiddle(), controller.CategoryQuery)
+	r.GET("/categories", middle.IdMiddle(), controller.CategoryQuery)
 	// 按id获取版块信息
-	r.GET("/categories/:id", middle.AuthMiddle(), controller.CategoryQueryById)
+	r.GET("/categories/:id", middle.IdMiddle(), controller.CategoryQueryById)
 	// 获取版块帖子列表
-	r.GET("/posts", middle.AuthMiddle(), controller.PostQuery)
+	r.GET("/posts", middle.IdMiddle(), controller.PostQuery)
 	// 获取版块帖子列表
-	r.GET("/posts2", middle.AuthMiddle(), controller.PostQueryReplyTime)
+	r.GET("/posts2", middle.IdMiddle(), controller.PostQueryReplyTime)
 	// 按id获取帖子信息
-	r.GET("/posts/:id", middle.AuthMiddle(), controller.PostQueryById)
+	r.GET("/posts/:id", middle.IdMiddle(), controller.PostQueryById)
 	// 获取评论列表
-	r.GET("/comments", middle.AuthMiddle(), controller.CommentQuery)
+	r.GET("/comments", middle.IdMiddle(), controller.CommentQuery)
 	// 获取评论信息
-	r.GET("/comments/:id", middle.AuthMiddle(), controller.CommentQueryById)
+	r.GET("/comments/:id", middle.IdMiddle(), controller.CommentQueryById)
 	// 获取用户信息
-	r.GET("/user:id", middle.AuthMiddle(), controller.UserQuery)
+	r.GET("/user/:id", middle.IdMiddle(), controller.UserQuery)
 
 	return r
 }

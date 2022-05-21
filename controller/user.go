@@ -101,10 +101,13 @@ func UserQuery(ctx *gin.Context) {
 	}
 
 	response.Response(ctx, response.CodeSuccess, gin.H{
-		"name":   user.Name,
-		"signal": user.Signal,
-		"lastip": user.LastLoginIpv4,
-		"speak":  fmt.Sprintf("%d", user.Speak),
+		"id":       user.ID,
+		"shielded": "0",
+		"name":     user.Name,
+		"speak":    fmt.Sprintf("%d", user.Speak),
+		"signal":   user.Signal,
+		"lastip":   user.LastLoginIpv4,
+		"lasttime": "0",
 	})
 
 	return

@@ -70,7 +70,7 @@ func CommentQueryByPostId(portId uint, left int, right int) (commentList []model
 		err = ErrorQueryFailed
 	}
 	curNum = count.RowsAffected
-	db.Model(&model.Post{}).Count(&totNum)
+	db.Model(&model.Comment{}).Count(&totNum)
 
 	return
 }

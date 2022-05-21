@@ -53,6 +53,24 @@ func CategoryCreate(ctx *gin.Context) {
 }
 
 func CategoryDelete(ctx *gin.Context) {
+
+	categoryIdStr := ctx.Param("id")
+
+	categoryId, err := strconv.ParseInt(categoryIdStr, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	if err := dao.CategoryDelete(uint(categoryId)); err != nil {
+		zap.L().Error("logic.signup failed", zap.Error(err))
+
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, nil)
+
 	return
 }
 

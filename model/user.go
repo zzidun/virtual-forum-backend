@@ -47,3 +47,10 @@ type UserLoginForm struct {
 	Name     string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+type UserUpdateForm struct {
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binging:"required"`
+	Password string `json:"password" binding:"required"`
+	Signal   string `json:"signal" binding:"required"`
+}

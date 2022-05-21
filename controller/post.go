@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -41,11 +42,43 @@ func PostPost(ctx *gin.Context) {
 		return
 	}
 
+	if err = dao.CategoryCountSpeak(uint(categoryId)); err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	if err = dao.UserCountSpeak(userId.(uint)); err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	if err = dao.UserCategoryCount(userId.(uint), uint(categoryId)); err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
 	response.Response(ctx, response.CodeSuccess, nil)
 	return
 }
 
 func PostDelete(ctx *gin.Context) {
+
+	postIdStr := ctx.Param("id")
+
+	postId, err := strconv.ParseInt(postIdStr, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	if err := dao.PostDelete(uint(postId)); err != nil {
+		zap.L().Error("logic.signup failed", zap.Error(err))
+
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, nil)
 
 	return
 }
@@ -111,5 +144,30 @@ func PostQueryReplyTime(ctx *gin.Context) {
 }
 
 func PostQueryById(ctx *gin.Context) {
+
+	postIdStr := ctx.Param("id")
+
+	postId, err := strconv.ParseInt(postIdStr, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	fmt.Println("postId")
+
+	post, err := dao.PostQueryById(uint(postId))
+
+	if err != nil {
+		zap.L().Error("logic.signup failed", zap.Error(err))
+
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, gin.H{
+		"title": post.Title,
+		"speak": fmt.Sprintf("%d", post.Speak),
+	})
+
 	return
 }

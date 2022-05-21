@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -53,12 +52,53 @@ func CommentPost(ctx *gin.Context) {
 		return
 	}
 
+	post, err := dao.PostQueryById(uint(postId))
+	if err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	if err = dao.CategoryCountSpeak(post.CategoryId); err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+	if err = dao.PostCountSpeak(post.ID); err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+	if err = dao.UserCountSpeak(userId.(uint)); err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+	if err = dao.UserCategoryCount(userId.(uint), post.CategoryId); err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
 	response.Response(ctx, response.CodeSuccess, nil)
 
 	return
 }
 
 func CommentDelete(ctx *gin.Context) {
+
+	commentIdStr := ctx.Param("id")
+
+	commentId, err := strconv.ParseInt(commentIdStr, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	if err := dao.CommentDelete(uint(commentId)); err != nil {
+		zap.L().Error("logic.signup failed", zap.Error(err))
+
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, nil)
+
 	return
 }
 
@@ -90,8 +130,6 @@ func CommentQuery(ctx *gin.Context) {
 		response.Response(ctx, response.CodeUnknownError, nil)
 		return
 	}
-
-	fmt.Println(left, right, postId)
 
 	response.Response(ctx, response.CodeSuccess, commentList)
 }

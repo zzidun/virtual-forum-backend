@@ -68,7 +68,7 @@ func ViewRouter(r *gin.Engine) *gin.Engine {
 	// 获取评论信息
 	r.GET("/comments/:id", controller.CommentQueryById)
 	// 获取用户信息
-	r.GET("/user:id", controller.UserInfoQuery)
+	r.GET("/user:id", controller.UserQuery)
 
 	return r
 }

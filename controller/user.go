@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -76,15 +77,40 @@ func UserLogin(ctx *gin.Context) {
 	response.ResponseSuccess(ctx, gin.H{
 		"user_id":   fmt.Sprintf("%d", userId),
 		"user_name": ulform.Name,
-		"token":    token,
+		"token":     token,
 	})
 }
 
-func UserInfoQuery(ctx *gin.Context) {
+func UserQuery(ctx *gin.Context) {
+
+	userIdStr := ctx.Param("id")
+
+	userId, err := strconv.ParseInt(userIdStr, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	user, err := dao.UserQueryById(uint(userId))
+
+	if err != nil {
+		zap.L().Error("logic.signup failed", zap.Error(err))
+
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, gin.H{
+		"name":   user.Name,
+		"signal": user.Signal,
+		"lastip": user.LastLoginIpv4,
+		"speak":  fmt.Sprintf("%d", user.Speak),
+	})
+
 	return
 }
 
-func UserInfoUpdate(ctx *gin.Context) {
+func UserUpdate(ctx *gin.Context) {
 	return
 }
 

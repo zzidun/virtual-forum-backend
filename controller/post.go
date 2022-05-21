@@ -152,8 +152,6 @@ func PostQueryById(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println("postId")
-
 	post, err := dao.PostQueryById(uint(postId))
 
 	if err != nil {

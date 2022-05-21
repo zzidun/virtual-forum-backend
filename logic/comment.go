@@ -7,7 +7,9 @@ import (
 	"zzidun.tech/vforum0/dao"
 )
 
-func CommentList(postId uint, left int, right int) (commentList *gin.H, err error) {
+func CommentList(postId uint, left int, right int, userId uint) (commentList *gin.H, err error) {
+
+	// 查询一页16个评论
 	comments, totNum, curNum, err := dao.CommentQueryByPostId(postId, left, right)
 	if err != nil {
 		return
@@ -18,8 +20,27 @@ func CommentList(postId uint, left int, right int) (commentList *gin.H, err erro
 		return
 	}
 
+	userShields, err := dao.UserShieldQueryByUser2(userId)
+	if err != nil {
+		return
+	}
+
 	var commentListData []*gin.H
 	for _, comment := range comments {
+
+		flag := false
+		for _, userShield := range userShields {
+			if userShield.UserId == comment.UserId {
+				flag = true
+				break
+			}
+		}
+
+		if flag {
+			continue
+		}
+
+		// 添加评论到返回结果
 
 		user, err := dao.UserQueryById(comment.UserId)
 		if err != nil {

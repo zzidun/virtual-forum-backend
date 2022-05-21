@@ -125,8 +125,6 @@ func CategoryQueryById(ctx *gin.Context) {
 			return
 		}
 
-		fmt.Println(userFollow)
-
 		response.Response(ctx, response.CodeSuccess, gin.H{
 			"followed": fmt.Sprintf("%d", userFollow.ID),
 			"name":     category.Name,

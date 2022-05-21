@@ -83,20 +83,41 @@ func UserLogin(ctx *gin.Context) {
 
 func UserQuery(ctx *gin.Context) {
 
+	userId, exist := ctx.Get("userId")
+
 	userIdStr := ctx.Param("id")
 
-	userId, err := strconv.ParseInt(userIdStr, 10, 32)
+	userId2, err := strconv.ParseInt(userIdStr, 10, 32)
 	if err != nil {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
 		return
 	}
 
-	user, err := dao.UserQueryById(uint(userId))
+	user, err := dao.UserQueryById(uint(userId2))
 
 	if err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
 		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	if exist {
+		UserShield, err := dao.UserShieldQuery(userId.(uint), uint(userId2))
+		if err != nil {
+			return
+		}
+
+		response.Response(ctx, response.CodeSuccess, gin.H{
+			"id":       user.ID,
+			"shielded": fmt.Sprintf("%d", UserShield.ID),
+			"name":     user.Name,
+			"speak":    fmt.Sprintf("%d", user.Speak),
+			"signal":   user.Signal,
+			"lastip":   user.LastLoginIpv4,
+			"lasttime": user.UpdatedAt,
+		})
+
 		return
 	}
 
@@ -107,7 +128,7 @@ func UserQuery(ctx *gin.Context) {
 		"speak":    fmt.Sprintf("%d", user.Speak),
 		"signal":   user.Signal,
 		"lastip":   user.LastLoginIpv4,
-		"lasttime": "0",
+		"lasttime": user.UpdatedAt,
 	})
 
 	return
@@ -138,93 +159,6 @@ func UserUpdate(ctx *gin.Context) {
 
 	if err := dao.UserUpdate(userId.(uint), uuForm.Email, uuForm.Password, uuForm.Signal); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
-
-		response.ResponseError(ctx, response.CodeUnknownError)
-		return
-	}
-
-	response.ResponseSuccess(ctx, nil)
-
-	return
-}
-
-func UserShieldCreate(ctx *gin.Context) {
-	return
-}
-
-func UserShieldQuery(ctx *gin.Context) {
-	return
-}
-
-func UserShieldQueryById(ctx *gin.Context) {
-	return
-}
-
-func UserShieldDelete(ctx *gin.Context) {
-	return
-}
-
-func PostCollectCreate(ctx *gin.Context) {
-	return
-}
-
-func PostCollectQuery(ctx *gin.Context) {
-	return
-}
-
-func PostCollectQueryById(ctx *gin.Context) {
-	return
-}
-
-func PostCollectDelete(ctx *gin.Context) {
-	return
-}
-
-func CategoryFollowCreate(ctx *gin.Context) {
-	userId, exist := ctx.Get("userId")
-	if !exist {
-		return
-	}
-
-	categoryIdStr := ctx.Query("category")
-	fmt.Println(categoryIdStr)
-	categoryId, err := strconv.ParseInt(categoryIdStr, 10, 32)
-	if err != nil {
-		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
-		return
-	}
-
-	if err := dao.UserFollowCreate(userId.(uint), uint(categoryId)); err != nil {
-		zap.L().Error("logic.signup failed", zap.Error(err))
-
-		response.ResponseError(ctx, response.CodeUnknownError)
-		return
-	}
-
-	response.ResponseSuccess(ctx, nil)
-
-	return
-}
-
-func CategoryFollowQuery(ctx *gin.Context) {
-	return
-}
-
-func CategoryFollowById(ctx *gin.Context) {
-	return
-}
-
-func CategoryFollowDelete(ctx *gin.Context) {
-
-	followIdStr := ctx.Param("id")
-
-	followId, err := strconv.ParseInt(followIdStr, 10, 32)
-	if err != nil {
-		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
-		return
-	}
-
-	if err := dao.UserFollowDelete(uint(followId)); err != nil {
 
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return

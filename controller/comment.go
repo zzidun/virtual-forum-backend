@@ -104,6 +104,8 @@ func CommentDelete(ctx *gin.Context) {
 
 func CommentQuery(ctx *gin.Context) {
 
+	userId, exist := ctx.Get("userId")
+
 	leftStr := ctx.Query("left")
 	rightStr := ctx.Query("right")
 	postIdStr := ctx.Query("post")
@@ -125,13 +127,25 @@ func CommentQuery(ctx *gin.Context) {
 		return
 	}
 
-	commentList, err := logic.CommentList(uint(postId), int(left), int(right))
-	if err != nil {
-		response.Response(ctx, response.CodeUnknownError, nil)
-		return
-	}
+	if exist {
+		commentList, err := logic.CommentList(uint(postId), int(left), int(right), userId.(uint))
+	
+		if err != nil {
+			response.Response(ctx, response.CodeUnknownError, nil)
+			return
+		}
 
-	response.Response(ctx, response.CodeSuccess, commentList)
+		response.Response(ctx, response.CodeSuccess, commentList)
+	} else {
+		commentList, err := logic.CommentList(uint(postId), int(left), int(right), 0)
+	
+		if err != nil {
+			response.Response(ctx, response.CodeUnknownError, nil)
+			return
+		}
+
+		response.Response(ctx, response.CodeSuccess, commentList)
+	}
 }
 
 func CommentQueryById(ctx *gin.Context) {

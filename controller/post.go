@@ -24,7 +24,6 @@ func PostPost(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&ppform); err != nil {
 		// 请求参数有误，直接返回响应
 		zap.L().Error("SiginUp with invalid param", zap.Error(err))
-
 		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, "参数错误")
 		return
 	}

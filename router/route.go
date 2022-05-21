@@ -42,7 +42,7 @@ func AdminRoute(r *gin.Engine) *gin.Engine {
 	category_router := r.Group("/categories", middle.AuthMiddle(), middle.AdminCheckMiddle())
 	category_router.POST("", controller.CategoryCreate)
 	category_router.DELETE("/:id", controller.CategoryDelete)
-	category_router.PUT("/:id", controller.CategoryerSet)
+	category_router.PUT("/:id", controller.CategoryUpdate)
 
 	r.GET("fails", controller.FailQuery)
 	r.GET("fails/:id", controller.FailQueryById)
@@ -52,23 +52,23 @@ func AdminRoute(r *gin.Engine) *gin.Engine {
 
 func ViewRouter(r *gin.Engine) *gin.Engine {
 	// 获取论坛首页
-	r.GET("/about", controller.About)
+	r.GET("/about", middle.AuthMiddle(), controller.About)
 	// 获取版块列表
-	r.GET("/categories", controller.CategoryQuery)
+	r.GET("/categories", middle.AuthMiddle(), controller.CategoryQuery)
 	// 按id获取版块信息
-	r.GET("/categories/:id", controller.CategoryQueryById)
+	r.GET("/categories/:id", middle.AuthMiddle(), controller.CategoryQueryById)
 	// 获取版块帖子列表
-	r.GET("/posts", controller.PostQuery)
+	r.GET("/posts", middle.AuthMiddle(), controller.PostQuery)
 	// 获取版块帖子列表
-	r.GET("/posts2", controller.PostQueryReplyTime)
+	r.GET("/posts2", middle.AuthMiddle(), controller.PostQueryReplyTime)
 	// 按id获取帖子信息
-	r.GET("/posts/:id", controller.PostQueryById)
+	r.GET("/posts/:id", middle.AuthMiddle(), controller.PostQueryById)
 	// 获取评论列表
-	r.GET("/comments", controller.CommentQuery)
+	r.GET("/comments", middle.AuthMiddle(), controller.CommentQuery)
 	// 获取评论信息
-	r.GET("/comments/:id", controller.CommentQueryById)
+	r.GET("/comments/:id", middle.AuthMiddle(), controller.CommentQueryById)
 	// 获取用户信息
-	r.GET("/user:id", controller.UserQuery)
+	r.GET("/user:id", middle.AuthMiddle(), controller.UserQuery)
 
 	return r
 }
@@ -101,10 +101,13 @@ func UserRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/collects/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.PostCollectQueryById)
 	r.DELETE("/collects/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.PostCollectDelete)
 	// 关注版块
-	r.PUT("/follows", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.CategoryFollowCreate)
+	r.POST("/follows", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.CategoryFollowCreate)
 	r.GET("/follows", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.CategoryFollowQuery)
 	r.GET("/follows/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.CategoryFollowById)
 	r.DELETE("/follows/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.CategoryFollowDelete)
+
+	// 编辑版块信息
+	r.POST("/wiki", middle.AuthMiddle(), controller.CategoryWiki)
 
 	return r
 }

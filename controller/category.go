@@ -100,6 +100,8 @@ func CategoryQuery(ctx *gin.Context) {
 
 func CategoryQueryById(ctx *gin.Context) {
 
+	userId, exist := ctx.Get("userId")
+
 	categoryIdStr := ctx.Param("id")
 
 	categoryId, err := strconv.ParseInt(categoryIdStr, 10, 32)
@@ -117,17 +119,36 @@ func CategoryQueryById(ctx *gin.Context) {
 		return
 	}
 
+	if exist {
+		userFollow, err := dao.UserFollowQuery(userId.(uint), uint(categoryId))
+		if err != nil {
+			return
+		}
+
+		fmt.Println(userFollow)
+
+		response.Response(ctx, response.CodeSuccess, gin.H{
+			"followed": fmt.Sprintf("%d", userFollow.ID),
+			"name":     category.Name,
+			"speak":    fmt.Sprintf("%d", category.Speak),
+			"follow":   fmt.Sprintf("%d", category.Follow),
+			"wiki":     fmt.Sprintf("%d", category.WikiId),
+		})
+		return
+	}
+
 	response.Response(ctx, response.CodeSuccess, gin.H{
-		"name":   category.Name,
-		"speak":  fmt.Sprintf("%d", category.Speak),
-		"follow": fmt.Sprintf("%d", category.Follow),
-		"wiki":   fmt.Sprintf("%d", category.WikiId),
+		"followed": "0",
+		"name":     category.Name,
+		"speak":    fmt.Sprintf("%d", category.Speak),
+		"follow":   fmt.Sprintf("%d", category.Follow),
+		"wiki":     fmt.Sprintf("%d", category.WikiId),
 	})
 
 	return
 }
 
-func CategoryerSet(ctx *gin.Context) {
+func CategoryUpdate(ctx *gin.Context) {
 
 	adminId, exist := ctx.Get("userId")
 	if !exist {
@@ -185,4 +206,8 @@ func CategoryerSet(ctx *gin.Context) {
 
 	response.Response(ctx, response.CodeSuccess, nil)
 	return
+}
+
+func CategoryWiki(ctx *gin.Context) {
+	
 }

@@ -5,6 +5,41 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
+// 更新版块关注人数
+func CategoryCountFollow(categoryId uint, dir uint) (err error) {
+	db := DatabaseGet()
+
+	var category model.Category
+
+	count := db.Where("id = ?", categoryId).Find(&category)
+
+	if count.Error != nil {
+		zap.L().Error("query post failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		zap.L().Error("query post failed", zap.Error(err))
+		err = ErrorNotExistFailed
+		return
+	}
+
+	if dir == 1 {
+		category.Follow++
+	} else {
+		category.Follow--
+	}
+
+	if err = db.Save(&category).Error; err != nil {
+		db.Rollback()
+		zap.L().Error("update post speak count failed", zap.Error(err))
+		err = ErrorInsertFailed
+		return
+	}
+
+	return
+}
+
 // 更新版块发言次数
 func CategoryCountSpeak(categoryId uint) (err error) {
 	db := DatabaseGet()

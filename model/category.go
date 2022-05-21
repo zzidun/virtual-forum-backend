@@ -37,6 +37,11 @@ type CategoryListEnrty struct {
 }
 
 type CategoryerForm struct {
-	UserId     string `json:"userid" binding:"required"`
-	Type       string `json:"type" binding:"required"`
+	UserId string `json:"userid" binding:"required"`
+	Type   string `json:"type" binding:"required"`
+}
+
+type CategoryWikiForm struct {
+	CategoryId string `json:"categoryid" binding:"required"`
+	PostId     string `json:"postid" binding:"required"`
 }

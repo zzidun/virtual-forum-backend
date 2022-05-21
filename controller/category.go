@@ -26,6 +26,8 @@ func CategoryCreate(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Println(authId.(uint))
+
 	var ccform *model.CategoryCreateForm
 	if err := ctx.ShouldBindJSON(&ccform); err != nil {
 		// 请求参数有误，直接返回响应
@@ -48,6 +50,8 @@ func CategoryCreate(ctx *gin.Context) {
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
+
+	response.Response(ctx, response.CodeSuccess, nil)
 
 	return
 }
@@ -165,7 +169,9 @@ func CategoryUpdate(ctx *gin.Context) {
 	}
 
 	valid, err := logic.UserCheckPerm(authId.(uint), logic.CodeCategoryPerm)
-	if err != nil || valid == 1 {
+	fmt.Println(valid)
+
+	if err != nil || valid == 0 {
 		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
 		return
 	}
@@ -188,7 +194,7 @@ func CategoryUpdate(ctx *gin.Context) {
 		return
 	}
 
-	categoryerId, err := strconv.ParseInt(cForm.UserId, 10, 32)
+	userId, err := strconv.ParseInt(cForm.UserId, 10, 32)
 	if err != nil {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "用户id错误")
 		return
@@ -206,7 +212,7 @@ func CategoryUpdate(ctx *gin.Context) {
 		return
 	}
 
-	if err := dao.CategoryerSet(uint(categoryerId), uint(categoryId), uint(categoryerType)); err != nil {
+	if err := dao.CategoryerSet(uint(categoryId), uint(userId), uint(categoryerType)); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
 		response.ResponseError(ctx, response.CodeUnknownError)

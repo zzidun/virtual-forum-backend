@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"zzidun.tech/vforum0/dao"
+	"zzidun.tech/vforum0/model"
 )
 
 func CategoryList(left int, right int) (categoryList *gin.H, err error) {
@@ -17,26 +18,28 @@ func CategoryList(left int, right int) (categoryList *gin.H, err error) {
 
 	for _, category := range categorys {
 
-		var userName string
+		var user *model.User
 		categoryer, err := dao.CategoryerQueryByCategoryId(category.ID)
 		if err != nil {
 			continue
 		}
 
 		if categoryer.ID != 0 {
-			user, err := dao.UserQueryById(categoryer.ID)
+			user, err = dao.UserQueryById(categoryer.UserId)
 			if err != nil {
 				continue
 			}
-			userName = user.Name
+		} else {
+			user = &model.User{}
 		}
 
 		categoryListData = append(categoryListData, &gin.H{
-			"id":         fmt.Sprintf("%d", category.ID),
-			"name":       category.Name,
-			"speak":      fmt.Sprintf("%d", category.Speak),
-			"follow":     fmt.Sprintf("%d", category.Follow),
-			"categoryer": userName,
+			"id":           fmt.Sprintf("%d", category.ID),
+			"name":         category.Name,
+			"speak":        fmt.Sprintf("%d", category.Speak),
+			"follow":       fmt.Sprintf("%d", category.Follow),
+			"categoryerid": fmt.Sprintf("%d", user.ID),
+			"categoryer":   user.Name,
 		})
 	}
 

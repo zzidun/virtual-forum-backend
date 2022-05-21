@@ -4,11 +4,24 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
-func CategoryerSet(categoryId uint, userId uint, categoryType uint) (err error) {
+func CategoryerSet(categoryId uint, userId uint, categoryerType uint) (err error) {
 	categoryer := model.Categoryer{
 		CategoryId: categoryId,
 		UserId:     userId,
-		Type:       categoryType,
+		Type:       categoryerType,
+	}
+
+	if categoryerType == 1 {
+		categoryerOld, err := CategoryerQueryByCategoryId(categoryId)
+		if err != nil {
+			return ErrorQueryFailed
+		}
+		if categoryerOld.ID != 0 {
+			err = CategoryerCancel(categoryerOld.ID)
+			if err != nil {
+				return ErrorDeleteFailed
+			}
+		}
 	}
 
 	db := DatabaseGet()
@@ -57,7 +70,7 @@ func CategoryerQueryByCategoryId(categoryId uint) (categoryer *model.Categoryer,
 
 	db := DatabaseGet()
 
-	count := db.Where("id = ? AND type = ?", categoryId, 1).Find(&categoryer)
+	count := db.Where("category_id = ? AND type = ?", categoryId, 1).Find(&categoryer)
 
 	if count.Error != nil {
 		err = ErrorQueryFailed

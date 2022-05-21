@@ -2,6 +2,8 @@ package model
 
 import "gorm.io/gorm"
 
+// 报文
+
 type User struct {
 	gorm.Model
 	Name          string `gorm:"type:varchar(20);not null;unique;uniqueIndex"`
@@ -36,6 +38,8 @@ type UserCollect struct {
 	Post   *Post
 	PostId uint `gorm:"not null"`
 }
+
+// 报文
 
 type UserRegisterForm struct {
 	Name     string `json:"name" binding:"required"`

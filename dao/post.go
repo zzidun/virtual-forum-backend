@@ -61,7 +61,7 @@ func PostQueryByCategoryId(categoryId uint, left int, right int) (postList []mod
 		err = ErrorQueryFailed
 	}
 	curNum = count.RowsAffected
-	db.Model(&model.Post{}).Count(&totNum)
+	db.Model(&model.Post{}).Where("category_id = ?", categoryId).Count(&totNum)
 
 	return
 }

@@ -2,6 +2,8 @@ package model
 
 import "gorm.io/gorm"
 
+// 实体
+
 type Post struct {
 	gorm.Model
 	Category   *Category
@@ -11,6 +13,8 @@ type Post struct {
 	User       *User
 	UserId     uint `gorm:"not null"`
 }
+
+// 报文
 
 type PostPostForm struct {
 	CategoryId string `json:"categoryid" binding:"required"`

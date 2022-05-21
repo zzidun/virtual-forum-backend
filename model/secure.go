@@ -2,6 +2,8 @@ package model
 
 import "gorm.io/gorm"
 
+// 实体
+
 type BannedIpv4 struct {
 	gorm.Model
 	LeftIp  string `gorm:"type:varchar(32);not null;unique"`

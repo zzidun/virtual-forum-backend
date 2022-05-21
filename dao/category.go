@@ -119,3 +119,32 @@ func CategoryQueryById(categoryId uint) (category model.Category, err error) {
 	}
 	return
 }
+
+func CategoryWikiSet(categoryId uint, postId uint) (err error) {
+	db := DatabaseGet()
+
+	var category model.Category
+	count := db.Where("id = ?", categoryId).Find(&category)
+
+	if count.Error != nil {
+		zap.L().Error("query category failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		zap.L().Error("query category failed", zap.Error(err))
+		err = ErrorNotExistFailed
+		return
+	}
+
+	category.WikiId = postId
+
+	if err = db.Save(&category).Error; err != nil {
+		db.Rollback()
+		zap.L().Error("update post speak count failed", zap.Error(err))
+		err = ErrorInsertFailed
+		return
+	}
+
+	return
+}

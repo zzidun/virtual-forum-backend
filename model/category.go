@@ -2,12 +2,13 @@ package model
 
 import "gorm.io/gorm"
 
+// 实体
+
 type Category struct {
 	gorm.Model
 	Name   string `gorm:"type:varchar(20);not null;unique;uniqueIndex"`
 	Speak  uint   `gorm:"not null"`
 	Follow uint   `gorm:"not null"`
-	Wiki   *Post
 	WikiId uint
 }
 
@@ -19,6 +20,8 @@ type Categoryer struct {
 	UserId     uint `gorm:"not null"`
 	Type       uint `gorm:"type:bool;not null"`
 }
+
+// 报文
 
 type CategoryCreateForm struct {
 	Name string `json:"name" binding:"required"`

@@ -48,3 +48,11 @@ func CategoryList(left int, right int) (categoryList *gin.H, err error) {
 
 	return
 }
+
+func CategoryerCheck(userId uint, categoryId uint) (ret bool, err error) {
+	categoryerId, err := dao.CategoryerQueryByCategoryId(categoryId)
+
+	ret = (categoryerId == userId)
+
+	return
+}

@@ -2,7 +2,8 @@ package model
 
 import "gorm.io/gorm"
 
-//管理员实体
+//实体
+
 type Admin struct {
 	gorm.Model
 	Name     string `gorm:"type:varchar(20);not null;unique;uniqueIndex"`
@@ -20,13 +21,12 @@ type AdminGroup struct {
 	PostPerm     bool   `gorm:"type:bool;not null"`
 }
 
-// 管理员登陆报文
+// 报文
+
 type AdminLoginForm struct {
 	Name     string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
-
-// 管理员创建报文
 type AdminCreateForm struct {
 	Name     string `json:"name" binding:"required"`
 	Password string `json:"password" binding:"required"`

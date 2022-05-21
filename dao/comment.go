@@ -61,16 +61,16 @@ func CommentQueryById(commentId uint) (err error) {
 	return
 }
 
-func CommentQueryByPostId(portId uint, left int, right int) (commentList []model.Comment, totNum int64, curNum int64, err error) {
+func CommentQueryByPostId(postId uint, left int, right int) (commentList []model.Comment, totNum int64, curNum int64, err error) {
 	db := DatabaseGet()
 
-	count := db.Where("post_id = ?", portId).Limit(right - left).Offset(left).Find(&commentList)
+	count := db.Where("post_id = ?", postId).Limit(right - left).Offset(left).Find(&commentList)
 
 	if count.Error != nil {
 		err = ErrorQueryFailed
 	}
 	curNum = count.RowsAffected
-	db.Model(&model.Comment{}).Count(&totNum)
+	db.Model(&model.Comment{}).Where("post_id = ?", postId).Count(&totNum)
 
 	return
 }

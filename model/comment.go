@@ -2,6 +2,8 @@ package model
 
 import "gorm.io/gorm"
 
+// 实体
+
 type Comment struct {
 	gorm.Model
 	Post    *Post
@@ -11,6 +13,8 @@ type Comment struct {
 	ReplyId uint
 	Content string `gorm:"type:text;not null"`
 }
+
+// 报文
 
 type CommentPostForm struct {
 	PostId  string `json:"postid" binding:"required"`

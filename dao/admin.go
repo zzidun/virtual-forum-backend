@@ -1,98 +1,76 @@
 package dao
 
 import (
-	"errors"
-	"strconv"
+	"fmt"
 
-	"go.uber.org/zap"
-	"golang.org/x/crypto/bcrypt"
 	"zzidun.tech/vforum0/model"
 )
 
-func AdminLogin(alform *model.AdminLoginForm) (id uint, err error) {
+// 把管理员绑定到用户
+func AdminAsignUser(userId uint, adminId uint) (err error) {
 
-	var user model.Admin
-
-	db := DatabaseGet()
-	db.Where("name = ?", alform.Name).First(&user)
-	if user.ID == 0 {
-		return 0, errors.New("密码错误")
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(alform.Password))
+	user, err := UserQueryById(userId)
 	if err != nil {
-		return 0, errors.New("密码错误")
+		return
 	}
 
-	return user.ID, nil
-}
+	user.AdminId = adminId
 
-func AdminReapetCheck(name string) (err error) {
 	db := DatabaseGet()
-	count := db.Where("name = ?", name).Find(&model.Admin{})
 
-	if count.Error != nil {
-		zap.L().Error("query admin failed", zap.Error(count.Error))
-		err = ErrorQueryFailed
-		return
-	}
-	if count.RowsAffected != 0 {
-		err = ErrorExistFailed
-		return
+	if db.Save(user).Error != nil {
+		return ErrorUpdateFailed
 	}
 
 	return
 }
 
-// 创建管理员，并且检查是否重复，加密密码
-func AdminCreate(acform *model.AdminCreateForm) (err error) {
-
-	groupid, err := strconv.ParseUint(acform.GroupId, 10, 32)
-
-	password, err := bcrypt.GenerateFromPassword([]byte(acform.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
+// 创建管理员
+func AdminCreate(userId uint) (admin *model.Admin, err error) {
 
 	// 组装用户对象
-	admin := model.Admin{
-		Name:     acform.Name,
-		Password: string(password),
-		GroupId:  uint(groupid),
-	}
-
-	if err = AdminReapetCheck(admin.Name); err != nil {
-		zap.L().Error("insert user failed", zap.Error(err))
-		return
+	admin = &model.Admin{
+		AdminPerm:    0,
+		BanPerm:      0,
+		CategoryPerm: 0,
 	}
 
 	db := DatabaseGet()
-	db.Create(admin)
+	if db.Create(&admin).Error != nil {
+		err = ErrorInsertFailed
+		return
+	}
+
+	fmt.Println(*admin)
+
+	err = AdminAsignUser(userId, admin.ID)
+
 	return
 
 }
 
-func AdminDelete(adminId uint) (err error) {
+// 取消管理员权限
+func AdminDelete(userId uint) (err error) {
 
 	db := DatabaseGet()
 
-	var admin model.Admin
-
-	count := db.Where("id = ?", adminId).Find(&admin)
-
-	if count.Error != nil {
-		zap.L().Error("query admin failed", zap.Error(err))
-		err = ErrorQueryFailed
+	user, err := UserQueryById(userId)
+	if err != nil {
 		return
 	}
-	if count.RowsAffected == 0 {
-		zap.L().Error("query admin failed", zap.Error(err))
-		err = ErrorNotExistFailed
+
+	admin, err := AdminQueryById(user.AdminId)
+	if err != nil {
 		return
+	}
+
+	user.AdminId = 0
+
+	if db.Save(user).Error != nil {
+		return ErrorUpdateFailed
 	}
 
 	if err = db.Delete(&admin).Error; err != nil {
-		zap.L().Error("delelte admin failed", zap.Error(err))
 		err = ErrorDeleteFailed
 		return
 	}
@@ -100,54 +78,43 @@ func AdminDelete(adminId uint) (err error) {
 	return
 }
 
-func AdminChangeGroup(adminId uint, groupId uint) (err error) {
+// 更新用户权限
+func AdminUpdate(adminId uint, adminPerm uint, banPerm uint, categoryPerm uint) (err error) {
 	db := DatabaseGet()
 
-	var admin model.Admin
+	admin, err := AdminQueryById(adminId)
+	if err != nil {
+		return
+	}
+
+	admin.AdminPerm = adminPerm
+	admin.BanPerm = banPerm
+	admin.CategoryPerm = categoryPerm
+
+	if db.Save(&admin).Error != nil {
+		return ErrorUpdateFailed
+	}
+
+	return
+}
+
+func AdminQuery() (admin []model.Admin, err error) {
+
+	return
+}
+
+func AdminQueryById(adminId uint) (admin *model.Admin, err error) {
+	db := DatabaseGet()
+
+	fmt.Println(adminId)
 
 	count := db.Where("id = ?", adminId).Find(&admin)
 
 	if count.Error != nil {
-		zap.L().Error("query admin failed", zap.Error(err))
 		err = ErrorQueryFailed
 		return
 	}
 	if count.RowsAffected == 0 {
-		zap.L().Error("query admin failed", zap.Error(err))
-		err = ErrorNotExistFailed
-		return
-	}
-
-	if err = db.Model(&admin).Update("group_id", groupId).Error; err != nil {
-		db.Rollback()
-		zap.L().Error("update userFollow failed", zap.Error(err))
-		err = ErrorInsertFailed
-		return
-	}
-
-	return
-}
-
-func AdminChangePassword(adminId uint, oldPassword string, newPassword string) (err error) {
-	return
-}
-
-func AdminQuery(admin *model.Admin) (err error) {
-	return
-}
-
-func AdminQueryById(adminId uint) (admin model.Admin, err error) {
-	db := DatabaseGet()
-
-	count := db.Where("id = ?", adminId).Find(&admin)
-
-	if count.Error != nil {
-		zap.L().Error("query category failed", zap.Error(err))
-		err = ErrorQueryFailed
-		return
-	}
-	if count.RowsAffected == 0 {
-		zap.L().Error("query category failed", zap.Error(err))
 		err = ErrorNotExistFailed
 		return
 	}

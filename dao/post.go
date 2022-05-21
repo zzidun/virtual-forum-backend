@@ -28,18 +28,8 @@ func PostDelete(postId uint) (err error) {
 
 	db := DatabaseGet()
 
-	var post model.Post
-
-	count := db.Where("id = ?", postId).Find(&post)
-
-	if count.Error != nil {
-		zap.L().Error("query post failed", zap.Error(err))
-		err = ErrorQueryFailed
-		return
-	}
-	if count.RowsAffected == 0 {
-		zap.L().Error("query post failed", zap.Error(err))
-		err = ErrorNotExistFailed
+	post, err := PostQueryById(postId)
+	if err != nil {
 		return
 	}
 
@@ -66,20 +56,19 @@ func PostQueryByCategoryId(categoryId uint, left int, right int) (postList []mod
 	return
 }
 
-func PostQueryById(postId uint) (post model.Post, err error) {
+func PostQueryById(postId uint) (post *model.Post, err error) {
 	db := DatabaseGet()
 
 	count := db.Where("id = ?", postId).Find(&post)
 
 	if count.Error != nil {
-		zap.L().Error("query post failed", zap.Error(err))
 		err = ErrorQueryFailed
 		return
 	}
 	if count.RowsAffected == 0 {
-		zap.L().Error("query post failed", zap.Error(err))
 		err = ErrorNotExistFailed
 		return
 	}
+
 	return
 }

@@ -15,7 +15,7 @@ import (
 // 发布文章
 func PostPost(ctx *gin.Context) {
 
-	userId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 	if !exist {
 		return
 	}
@@ -34,7 +34,7 @@ func PostPost(ctx *gin.Context) {
 		return
 	}
 
-	if err := dao.PostCreate(uint(categoryId), ppform.Title, userId.(uint)); err != nil {
+	if err := dao.PostCreate(uint(categoryId), ppform.Title, authId.(uint)); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
 		response.ResponseError(ctx, response.CodeUnknownError)
@@ -46,12 +46,12 @@ func PostPost(ctx *gin.Context) {
 		return
 	}
 
-	if err = dao.UserCountSpeak(userId.(uint)); err != nil {
+	if err = dao.UserCountSpeak(authId.(uint)); err != nil {
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
 
-	if err = dao.UserCategoryCount(userId.(uint), uint(categoryId)); err != nil {
+	if err = dao.UserCategoryCount(authId.(uint), uint(categoryId)); err != nil {
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
@@ -62,11 +62,33 @@ func PostPost(ctx *gin.Context) {
 
 func PostDelete(ctx *gin.Context) {
 
+	authId, exist := ctx.Get("authId")
+	if !exist {
+		return
+	}
+
 	postIdStr := ctx.Param("id")
 
 	postId, err := strconv.ParseInt(postIdStr, 10, 32)
 	if err != nil {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	post, err := dao.PostQueryById(uint(postId))
+	if err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	valid, err := logic.CategoryerCheck(authId.(uint), post.CategoryId)
+	if err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	if post.UserId != authId.(uint) && !valid {
+		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
 

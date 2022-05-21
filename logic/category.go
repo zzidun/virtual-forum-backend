@@ -18,15 +18,15 @@ func CategoryList(left int, right int) (categoryList *gin.H, err error) {
 	for _, category := range categorys {
 
 		var userName string
-		userId, err := dao.CategoryerQueryByCategoryId(category.ID)
+		categoryer, err := dao.CategoryerQueryByCategoryId(category.ID)
 		if err != nil {
-			break
+			continue
 		}
 
-		if userId != 0 {
-			user, err := dao.UserQueryById(userId)
+		if categoryer.ID != 0 {
+			user, err := dao.UserQueryById(categoryer.ID)
 			if err != nil {
-				break
+				continue
 			}
 			userName = user.Name
 		}
@@ -52,7 +52,7 @@ func CategoryList(left int, right int) (categoryList *gin.H, err error) {
 func CategoryerCheck(userId uint, categoryId uint) (ret bool, err error) {
 	categoryerId, err := dao.CategoryerQueryByCategoryId(categoryId)
 
-	ret = (categoryerId == userId)
+	ret = (categoryerId.ID == userId)
 
 	return
 }

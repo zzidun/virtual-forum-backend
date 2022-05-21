@@ -12,7 +12,7 @@ import (
 )
 
 func UserShieldCreate(ctx *gin.Context) {
-	userId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 	if !exist {
 		return
 	}
@@ -39,7 +39,12 @@ func UserShieldCreate(ctx *gin.Context) {
 		return
 	}
 
-	if err := dao.UserShieldCreate(userId.(uint), uint(shieldUserId)); err != nil {
+	if uint(shieldUserId) == authId.(uint) {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	if err := dao.UserShieldCreate(authId.(uint), uint(shieldUserId)); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
 		response.ResponseError(ctx, response.CodeUnknownError)

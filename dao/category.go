@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"go.uber.org/zap"
 	"zzidun.tech/vforum0/model"
 )
 
@@ -10,7 +9,6 @@ func CategoryReapetCheck(name string) (err error) {
 	count := db.Where("name = ?", name).Find(&model.Category{})
 
 	if count.Error != nil {
-		zap.L().Error("query category failed", zap.Error(count.Error))
 		err = ErrorQueryFailed
 		return
 	}
@@ -30,7 +28,6 @@ func CategoryCreate(name string) (err error) {
 	}
 
 	if err = CategoryReapetCheck(category.Name); err != nil {
-		zap.L().Error("insert user failed", zap.Error(err))
 		return
 	}
 
@@ -38,7 +35,6 @@ func CategoryCreate(name string) (err error) {
 
 	if err = db.Create(&category).Error; err != nil {
 		db.Rollback()
-		zap.L().Error("insert category failed", zap.Error(err))
 		err = ErrorInsertFailed
 		return
 	}
@@ -59,27 +55,17 @@ func CategoryerUpdate(categoryId uint, userId uint) (err error) {
 	return
 }
 
+// 删除版块
 func CategoryDelete(categoryId uint) (err error) {
 
 	db := DatabaseGet()
 
-	var category model.Category
-
-	count := db.Where("id = ?", categoryId).Find(&category)
-
-	if count.Error != nil {
-		zap.L().Error("query category failed", zap.Error(err))
-		err = ErrorQueryFailed
-		return
-	}
-	if count.RowsAffected == 0 {
-		zap.L().Error("query category failed", zap.Error(err))
-		err = ErrorNotExistFailed
+	category, err := CategoryQueryById(categoryId)
+	if err != nil {
 		return
 	}
 
 	if err = db.Delete(&category).Error; err != nil {
-		zap.L().Error("delelte category failed", zap.Error(err))
 		err = ErrorDeleteFailed
 		return
 	}
@@ -101,19 +87,17 @@ func CategoryQuery(left int, right int) (category []model.Category, totNum int64
 	return
 }
 
-func CategoryQueryById(categoryId uint) (category model.Category, err error) {
+func CategoryQueryById(categoryId uint) (category *model.Category, err error) {
 
 	db := DatabaseGet()
 
 	count := db.Where("id = ?", categoryId).Find(&category)
 
 	if count.Error != nil {
-		zap.L().Error("query category failed", zap.Error(err))
 		err = ErrorQueryFailed
 		return
 	}
 	if count.RowsAffected == 0 {
-		zap.L().Error("query category failed", zap.Error(err))
 		err = ErrorNotExistFailed
 		return
 	}
@@ -123,17 +107,8 @@ func CategoryQueryById(categoryId uint) (category model.Category, err error) {
 func CategoryWikiSet(categoryId uint, postId uint) (err error) {
 	db := DatabaseGet()
 
-	var category model.Category
-	count := db.Where("id = ?", categoryId).Find(&category)
-
-	if count.Error != nil {
-		zap.L().Error("query category failed", zap.Error(err))
-		err = ErrorQueryFailed
-		return
-	}
-	if count.RowsAffected == 0 {
-		zap.L().Error("query category failed", zap.Error(err))
-		err = ErrorNotExistFailed
+	category, err := CategoryQueryById(categoryId)
+	if err != nil {
 		return
 	}
 
@@ -141,7 +116,6 @@ func CategoryWikiSet(categoryId uint, postId uint) (err error) {
 
 	if err = db.Save(&category).Error; err != nil {
 		db.Rollback()
-		zap.L().Error("update post speak count failed", zap.Error(err))
 		err = ErrorInsertFailed
 		return
 	}

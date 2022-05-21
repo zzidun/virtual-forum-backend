@@ -13,7 +13,7 @@ import (
 
 func CommentPost(ctx *gin.Context) {
 
-	userId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 	if !exist {
 		return
 	}
@@ -45,7 +45,7 @@ func CommentPost(ctx *gin.Context) {
 		}
 	}
 
-	if err := dao.CommentCreate(uint(postId), userId.(uint), uint(replyId), cpform.Content); err != nil {
+	if err := dao.CommentCreate(uint(postId), authId.(uint), uint(replyId), cpform.Content); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
 		response.Response(ctx, response.CodeUnknownError, nil)
@@ -66,11 +66,11 @@ func CommentPost(ctx *gin.Context) {
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
-	if err = dao.UserCountSpeak(userId.(uint)); err != nil {
+	if err = dao.UserCountSpeak(authId.(uint)); err != nil {
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
-	if err = dao.UserCategoryCount(userId.(uint), post.CategoryId); err != nil {
+	if err = dao.UserCategoryCount(authId.(uint), post.CategoryId); err != nil {
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
@@ -82,11 +82,39 @@ func CommentPost(ctx *gin.Context) {
 
 func CommentDelete(ctx *gin.Context) {
 
+	authId, exist := ctx.Get("authId")
+	if !exist {
+		return
+	}
+
 	commentIdStr := ctx.Param("id")
 
 	commentId, err := strconv.ParseInt(commentIdStr, 10, 32)
 	if err != nil {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	comment, err := dao.CommentQueryById(uint(commentId))
+	if err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	post, err := dao.PostQueryById(comment.PostId)
+	if err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	valid, err := logic.CategoryerCheck(authId.(uint), post.CategoryId)
+	if err != nil {
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	if comment.UserId != authId.(uint) && !valid {
+		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
 
@@ -104,7 +132,7 @@ func CommentDelete(ctx *gin.Context) {
 
 func CommentQuery(ctx *gin.Context) {
 
-	userId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 
 	leftStr := ctx.Query("left")
 	rightStr := ctx.Query("right")
@@ -128,8 +156,8 @@ func CommentQuery(ctx *gin.Context) {
 	}
 
 	if exist {
-		commentList, err := logic.CommentList(uint(postId), int(left), int(right), userId.(uint))
-	
+		commentList, err := logic.CommentList(uint(postId), int(left), int(right), authId.(uint))
+
 		if err != nil {
 			response.Response(ctx, response.CodeUnknownError, nil)
 			return
@@ -138,7 +166,7 @@ func CommentQuery(ctx *gin.Context) {
 		response.Response(ctx, response.CodeSuccess, commentList)
 	} else {
 		commentList, err := logic.CommentList(uint(postId), int(left), int(right), 0)
-	
+
 		if err != nil {
 			response.Response(ctx, response.CodeUnknownError, nil)
 			return

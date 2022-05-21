@@ -34,8 +34,7 @@ func IdMiddle() func(ctx *gin.Context) {
 			return
 		}
 		// 将当前请求的userID信息保存到请求的上下文c上
-		ctx.Set("userType", mc.UserType)
-		ctx.Set("userId", mc.UserId)
+		ctx.Set("authId", mc.UserId)
 		ctx.Next() // 后续的处理函数可以用过c.Get(ContextUserIDKey)来获取当前请求的用户信息
 	}
 }
@@ -68,38 +67,7 @@ func AuthMiddle() func(ctx *gin.Context) {
 			return
 		}
 		// 将当前请求的userID信息保存到请求的上下文c上
-		ctx.Set("userType", mc.UserType)
-		ctx.Set("userId", mc.UserId)
-		ctx.Next() // 后续的处理函数可以用过c.Get(ContextUserIDKey)来获取当前请求的用户信息
-	}
-}
-
-// 管理员权限检测中间件
-func AdminCheckMiddle() func(ctx *gin.Context) {
-	return func(ctx *gin.Context) {
-
-		user_type, exist := ctx.Get("userType")
-		if !exist || user_type.(uint) != 1 {
-			response.ResponseErrorWithMsg(ctx, response.CodeInvalidToken, "请重新登陆管理员帐号")
-			ctx.Abort()
-			return
-		}
-
-		ctx.Next() // 后续的处理函数可以用过c.Get(ContextUserIDKey)来获取当前请求的用户信息
-	}
-}
-
-// 用户权限检测中间件
-func UserCheckMiddle() func(ctx *gin.Context) {
-	return func(ctx *gin.Context) {
-
-		user_type, exist := ctx.Get("userType")
-		if !exist || user_type.(uint) != 0 {
-			response.ResponseErrorWithMsg(ctx, response.CodeInvalidToken, "请重新登陆用户帐号")
-			ctx.Abort()
-			return
-		}
-
+		ctx.Set("authId", mc.UserId)
 		ctx.Next() // 后续的处理函数可以用过c.Get(ContextUserIDKey)来获取当前请求的用户信息
 	}
 }

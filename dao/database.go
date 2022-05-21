@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/spf13/viper"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"zzidun.tech/vforum0/model"
@@ -33,7 +32,6 @@ func DatabaseInit() {
 	}
 
 	db.AutoMigrate(&model.Admin{})
-	db.AutoMigrate(&model.AdminGroup{})
 	db.AutoMigrate(&model.Category{})
 	db.AutoMigrate(&model.Categoryer{})
 	db.AutoMigrate(&model.Post{})
@@ -58,33 +56,40 @@ func DatabaseGet() *gorm.DB {
 func AdminInit() {
 	db := DatabaseGet()
 
-	acount := db.Find(&model.Admin{})
-	agcount := db.Find(&model.AdminGroup{})
+	var user *model.User
 
-	password, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	count := db.Find(&model.User{})
+
+	name, emailOrigin, passwordOrigin, err := rootConfig()
 	if err != nil {
 		return
 	}
 
-	if agcount.RowsAffected == 0 && acount.RowsAffected == 0 {
-		admingroup := model.AdminGroup{
-			Name:         "root",
-			AdminPerm:    true,
-			BanPerm:      true,
-			CategoryPerm: true,
-			PostPerm:     true,
+	if count.RowsAffected == 0 {
+		user, err = UserCreate(name, emailOrigin, passwordOrigin)
+		if err != nil {
+			return
 		}
 
-		admin := model.Admin{
-			Name:     "root",
-			Password: string(password),
-			GroupId:  1,
+		admin, err := AdminCreate(user.ID)
+		if err != nil {
+			return
 		}
 
-		db.Create(&admingroup)
-		db.Create(&admin)
+		err = AdminUpdate(admin.ID, 1, 1, 1)
+		if err != nil {
+			return
+		}
+
 	}
 
 	return
+}
 
+func rootConfig() (name string, email string, password string, err error) {
+	name = "root"
+	email = "root@zzidun.tech"
+	password = "password"
+
+	return
 }

@@ -10,7 +10,7 @@ import (
 )
 
 func CategoryFollowCreate(ctx *gin.Context) {
-	userId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 	if !exist {
 		return
 	}
@@ -22,7 +22,7 @@ func CategoryFollowCreate(ctx *gin.Context) {
 		return
 	}
 
-	if err := dao.UserFollowCreate(userId.(uint), uint(categoryId)); err != nil {
+	if err := dao.UserFollowCreate(authId.(uint), uint(categoryId)); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
 		response.ResponseError(ctx, response.CodeUnknownError)

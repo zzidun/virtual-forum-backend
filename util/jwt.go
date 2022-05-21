@@ -11,9 +11,8 @@ import (
 )
 
 type Claims struct {
-	UserType uint   `json:"user_type"`
-	UserId   uint   `json:"user_id"`
-	Name     string `json:"name"`
+	UserId uint   `json:"user_id"`
+	Name   string `json:"name"`
 	jwt.StandardClaims
 }
 
@@ -38,10 +37,9 @@ func JwtKeyGet(_ *jwt.Token) (i interface{}, err error) {
 	return gSecret, nil
 }
 
-func TokenRelease(userType uint, userId uint, name string) (token string, err error) {
+func TokenRelease(userId uint, name string) (token string, err error) {
 	// 创建一个我们自己的声明
 	c := Claims{
-		userType,
 		userId, // 自定义字段
 		name,   // 自定义字段
 		jwt.StandardClaims{ // JWT规定的7个官方字段
@@ -80,7 +78,7 @@ func TokenRefresh(token string) (newToken string, err error) {
 
 	// 当access token是过期错误 并且 refresh token没有过期时就创建一个新的access token
 	if v.Errors == jwt.ValidationErrorExpired {
-		return TokenRelease(claims.UserType, claims.UserId, claims.Name)
+		return TokenRelease(claims.UserId, claims.Name)
 	}
 	return
 }

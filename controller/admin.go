@@ -1,57 +1,31 @@
 package controller
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 	"zzidun.tech/vforum0/dao"
+	"zzidun.tech/vforum0/logic"
 	"zzidun.tech/vforum0/model"
 	"zzidun.tech/vforum0/response"
-	"zzidun.tech/vforum0/util"
 )
 
-type AdminPermCode int64
-
-const (
-	CodeAdminPerm    AdminPermCode = 1000
-	CodeBanPerm      AdminPermCode = 1001
-	CodeCategoryPerm AdminPermCode = 1002
-	CodePostPerm     AdminPermCode = 1003
-)
-
-func AdminCheckPerm(adminId uint, code AdminPermCode) (valid bool, err error) {
-	admin, err := dao.AdminQueryById(adminId)
-	if err != nil {
-		return false, err
+func AdminCreate(ctx *gin.Context) {
+	authId, exist := ctx.Get("authId")
+	if !exist {
+		return
 	}
 
-	admingroup, err := dao.AdmingroupQueryById(admin.GroupId)
-	if err != nil {
-		return false, err
+	valid, err := logic.UserCheckPerm(authId.(uint), logic.CodeAdminPerm)
+	if err != nil || valid == 0 {
+		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
+		return
 	}
 
-	switch code {
-	case CodeAdminPerm:
-		valid = admingroup.AdminPerm
-	case CodeBanPerm:
-		valid = admingroup.BanPerm
-	case CodeCategoryPerm:
-		valid = admingroup.CategoryPerm
-	case CodePostPerm:
-		valid = admingroup.PostPerm
-	default:
-		return false, nil
-	}
-
-	return
-}
-
-func AdminLogin(ctx *gin.Context) {
-
-	var alform *model.AdminLoginForm
-	if err := ctx.ShouldBindJSON(&alform); err != nil {
+	var aForm *model.AdminForm
+	if err := ctx.ShouldBindJSON(&aForm); err != nil {
 		// 请求参数有误，直接返回响应
 		zap.L().Error("SiginUp with invalid param", zap.Error(err))
 		// 判断err是不是 validator.ValidationErrors类型的errors
@@ -66,39 +40,216 @@ func AdminLogin(ctx *gin.Context) {
 		return
 	}
 
-	id, err := dao.AdminLogin(alform)
+	userId, err := strconv.ParseInt(aForm.UserId, 10, 32)
 	if err != nil {
-		zap.L().Error("logic.Login failed", zap.String("username", alform.Name), zap.Error(err))
-
-		response.ResponseError(ctx, response.CodeUnknownError)
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+	adminPerm, err := strconv.ParseInt(aForm.AdminPerm, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+	banPerm, err := strconv.ParseInt(aForm.BanPerm, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+	categoryPerm, err := strconv.ParseInt(aForm.CategoryPerm, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
 		return
 	}
 
-	token, err := util.TokenRelease(1, id, alform.Name)
+	admin, err := dao.AdminCreate(uint(userId))
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
+		return
+	}
 
-	response.ResponseSuccess(ctx, gin.H{
-		"user_id":   fmt.Sprintf("%d", id),
-		"user_name": alform.Name,
-		"token":     token,
-	})
-}
+	err = dao.AdminUpdate(admin.ID, uint(adminPerm), uint(banPerm), uint(categoryPerm))
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
+		return
+	}
 
-func AdminCreate(ctx *gin.Context) {
+	response.Response(ctx, response.CodeSuccess, nil)
+
 	return
 }
 
 func AdminDelete(ctx *gin.Context) {
+	authId, exist := ctx.Get("authId")
+	if !exist {
+		return
+	}
+
+	valid, err := logic.UserCheckPerm(authId.(uint), logic.CodeAdminPerm)
+	if err != nil || valid == 0 {
+		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	userIdStr := ctx.Param("id")
+
+	userId, err := strconv.ParseInt(userIdStr, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	if err = dao.AdminDelete(uint(userId)); err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, nil)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, nil)
+
 	return
 }
 
 func AdminUpdate(ctx *gin.Context) {
+	authId, exist := ctx.Get("authId")
+	if !exist {
+		return
+	}
+
+	valid, err := logic.UserCheckPerm(authId.(uint), logic.CodeAdminPerm)
+	if err != nil || valid == 0 {
+		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	userIdStr := ctx.Param("id")
+
+	userId, err := strconv.ParseInt(userIdStr, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	var aForm *model.AdminForm
+	if err := ctx.ShouldBindJSON(&aForm); err != nil {
+		// 请求参数有误，直接返回响应
+		zap.L().Error("SiginUp with invalid param", zap.Error(err))
+		// 判断err是不是 validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// 非validator.ValidationErrors类型错误直接返回
+			response.ResponseError(ctx, response.CodeInvalidParams) // 请求参数错误
+			return
+		}
+		// validator.ValidationErrors类型错误则进行翻译
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, errs)
+		return
+	}
+
+	adminPerm, err := strconv.ParseInt(aForm.AdminPerm, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+	banPerm, err := strconv.ParseInt(aForm.BanPerm, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+	categoryPerm, err := strconv.ParseInt(aForm.CategoryPerm, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	user, err := dao.UserQueryById(uint(userId))
+
+	err = dao.AdminUpdate(user.AdminId, uint(adminPerm), uint(banPerm), uint(categoryPerm))
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, nil)
+
 	return
 }
 
 func AdminQuery(ctx *gin.Context) {
+	authId, exist := ctx.Get("authId")
+	if !exist {
+		return
+	}
+
+	valid, err := logic.UserCheckPerm(authId.(uint), logic.CodeAdminPerm)
+	if err != nil || valid == 0 {
+		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	leftStr := ctx.Query("left")
+	rightStr := ctx.Query("right")
+
+	left, err := strconv.ParseInt(leftStr, 10, 32)
+	if err != nil {
+		response.Response(ctx, response.CodeUnknownError, nil)
+		return
+	}
+	right, err := strconv.ParseInt(rightStr, 10, 32)
+	if err != nil {
+		response.Response(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	adminList, err := logic.AdminList(int(left), int(right))
+
+	if err != nil {
+		response.Response(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, adminList)
+
 	return
 }
 
 func AdminQueryById(ctx *gin.Context) {
+	authId, exist := ctx.Get("authId")
+	if !exist {
+		return
+	}
+
+	valid, err := logic.UserCheckPerm(authId.(uint), logic.CodeAdminPerm)
+	if err != nil || valid == 0 {
+		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
+		return
+	}
+
+	userIdStr := ctx.Param("id")
+
+	userId, err := strconv.ParseInt(userIdStr, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	user, err := dao.UserQueryById(uint(userId))
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	admin, err := dao.AdminQueryById(user.AdminId)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	response.Response(ctx, response.CodeSuccess, gin.H{
+		"userid":       user.ID,
+		"userName":     user.Name,
+		"adminperm":    admin.AdminPerm,
+		"banperm":      admin.BanPerm,
+		"categoryperm": admin.CategoryPerm,
+	})
+
 	return
 }

@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"go.uber.org/zap"
 	"zzidun.tech/vforum0/model"
 )
 
@@ -17,7 +16,6 @@ func CommentCreate(postId uint, userId uint, replyId uint, content string) (err 
 	db := DatabaseGet()
 	if err = db.Create(&comment).Error; err != nil {
 		db.Rollback()
-		zap.L().Error("insert comment failed", zap.Error(err))
 		err = ErrorInsertFailed
 		return
 	}
@@ -29,23 +27,13 @@ func CommentDelete(commentId uint) (err error) {
 
 	db := DatabaseGet()
 
-	var comment model.Comment
-
-	count := db.Where("id = ?", commentId).Find(&comment)
-
-	if count.Error != nil {
-		zap.L().Error("query comment failed", zap.Error(err))
-		err = ErrorQueryFailed
-		return
-	}
-	if count.RowsAffected == 0 {
-		zap.L().Error("query comment failed", zap.Error(err))
-		err = ErrorNotExistFailed
+	comment, err := CommentQueryById(commentId)
+	if err != nil {
 		return
 	}
 
 	if err = db.Delete(&comment).Error; err != nil {
-		zap.L().Error("delelte comment failed", zap.Error(err))
+		db.Rollback()
 		err = ErrorDeleteFailed
 		return
 	}
@@ -57,7 +45,19 @@ func CommentQuery(commentIdLeft uint, commentIdRight uint) (err error) {
 	return
 }
 
-func CommentQueryById(commentId uint) (err error) {
+func CommentQueryById(commentId uint) (comment *model.Comment, err error) {
+
+	db := DatabaseGet()
+	count := db.Where("id = ?", commentId).Find(&comment)
+
+	if count.Error != nil {
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		err = ErrorNotExistFailed
+		return
+	}
 	return
 }
 

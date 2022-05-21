@@ -17,8 +17,8 @@ import (
 // 处理用户注册
 func UserRegister(ctx *gin.Context) {
 
-	var urform *model.UserRegisterForm
-	if err := ctx.ShouldBindJSON(&urform); err != nil {
+	var urForm *model.UserRegisterForm
+	if err := ctx.ShouldBindJSON(&urForm); err != nil {
 		// 请求参数有误，直接返回响应
 		zap.L().Error("SiginUp with invalid param", zap.Error(err))
 		// 判断err是不是 validator.ValidationErrors类型的errors
@@ -33,9 +33,8 @@ func UserRegister(ctx *gin.Context) {
 		return
 	}
 
-	if err := dao.UserCreate(urform); err != nil {
-		zap.L().Error("logic.signup failed", zap.Error(err))
-
+	_, err := dao.UserCreate(urForm.Name, urForm.Email, urForm.Password)
+	if err != nil {
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
@@ -46,8 +45,8 @@ func UserRegister(ctx *gin.Context) {
 // 处理用户登陆
 func UserLogin(ctx *gin.Context) {
 
-	var ulform *model.UserLoginForm
-	if err := ctx.ShouldBindJSON(&ulform); err != nil {
+	var ulForm *model.UserLoginForm
+	if err := ctx.ShouldBindJSON(&ulForm); err != nil {
 		// 请求参数有误，直接返回响应
 		zap.L().Error("SiginUp with invalid param", zap.Error(err))
 		// 判断err是不是 validator.ValidationErrors类型的errors
@@ -62,48 +61,44 @@ func UserLogin(ctx *gin.Context) {
 		return
 	}
 
-	userId, err := dao.UserLogin(ulform)
+	user, err := dao.UserLogin(ulForm.Name, ulForm.Password)
 	if err != nil {
-		zap.L().Error("logic.Login failed", zap.String("username", ulform.Name), zap.Error(err))
-
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
 
-	token, err := util.TokenRelease(0, userId, ulform.Name)
+	token, err := util.TokenRelease(user.ID, user.Name)
 
-	dao.UserUpdateLoginIpv4(userId, ctx.ClientIP())
+	dao.UserUpdateLoginIpv4(user.ID, ctx.ClientIP())
 
 	response.ResponseSuccess(ctx, gin.H{
-		"user_id":   fmt.Sprintf("%d", userId),
-		"user_name": ulform.Name,
+		"user_id":   fmt.Sprintf("%d", user.ID),
+		"user_name": user.Name,
 		"token":     token,
 	})
 }
 
 func UserQuery(ctx *gin.Context) {
 
-	userId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 
 	userIdStr := ctx.Param("id")
 
-	userId2, err := strconv.ParseInt(userIdStr, 10, 32)
+	userId, err := strconv.ParseInt(userIdStr, 10, 32)
 	if err != nil {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
 		return
 	}
 
-	user, err := dao.UserQueryById(uint(userId2))
+	user, err := dao.UserQueryById(uint(userId))
 
 	if err != nil {
-		zap.L().Error("logic.signup failed", zap.Error(err))
-
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
 	}
 
 	if exist {
-		UserShield, err := dao.UserShieldQuery(userId.(uint), uint(userId2))
+		UserShield, err := dao.UserShieldQuery(authId.(uint), uint(userId))
 		if err != nil {
 			return
 		}
@@ -136,7 +131,7 @@ func UserQuery(ctx *gin.Context) {
 
 func UserUpdate(ctx *gin.Context) {
 
-	userId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 	if !exist {
 		return
 	}
@@ -157,7 +152,9 @@ func UserUpdate(ctx *gin.Context) {
 		return
 	}
 
-	if err := dao.UserUpdate(userId.(uint), uuForm.Email, uuForm.Password, uuForm.Signal); err != nil {
+	_, err := dao.UserUpdate(authId.(uint), uuForm.Email, uuForm.Password, uuForm.Signal)
+
+	if err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
 		response.ResponseError(ctx, response.CodeUnknownError)

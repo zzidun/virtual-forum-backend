@@ -25,7 +25,22 @@ func UserShieldCreate(userId uint, shieldUserId uint) (err error) {
 func UserShieldDelete(shieldId uint) (err error) {
 	db := DatabaseGet()
 
-	var shield model.UserShield
+	shield, err := UserShieldQueryById(shieldId)
+	if err != nil {
+		return
+	}
+
+	if err = db.Delete(&shield).Error; err != nil {
+		zap.L().Error("delelte shield failed", zap.Error(err))
+		err = ErrorDeleteFailed
+		return
+	}
+
+	return
+}
+
+func UserShieldQueryById(shieldId uint) (shield *model.UserShield, err error) {
+	db := DatabaseGet()
 
 	count := db.Where("id = ?", shieldId).Find(&shield)
 
@@ -39,13 +54,6 @@ func UserShieldDelete(shieldId uint) (err error) {
 		err = ErrorNotExistFailed
 		return
 	}
-
-	if err = db.Delete(&shield).Error; err != nil {
-		zap.L().Error("delelte shield failed", zap.Error(err))
-		err = ErrorDeleteFailed
-		return
-	}
-
 	return
 }
 

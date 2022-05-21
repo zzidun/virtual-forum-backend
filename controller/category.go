@@ -15,13 +15,13 @@ import (
 
 func CategoryCreate(ctx *gin.Context) {
 
-	adminId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 	if !exist {
 		return
 	}
 
-	valid, err := AdminCheckPerm(adminId.(uint), CodeCategoryPerm)
-	if err != nil || !valid {
+	valid, err := logic.UserCheckPerm(authId.(uint), logic.CodeCategoryPerm)
+	if err != nil || valid == 0 {
 		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
 		return
 	}
@@ -53,6 +53,17 @@ func CategoryCreate(ctx *gin.Context) {
 }
 
 func CategoryDelete(ctx *gin.Context) {
+
+	authId, exist := ctx.Get("authId")
+	if !exist {
+		return
+	}
+
+	valid, err := logic.UserCheckPerm(authId.(uint), logic.CodeCategoryPerm)
+	if err != nil || valid == 0 {
+		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
+		return
+	}
 
 	categoryIdStr := ctx.Param("id")
 
@@ -100,7 +111,7 @@ func CategoryQuery(ctx *gin.Context) {
 
 func CategoryQueryById(ctx *gin.Context) {
 
-	userId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 
 	categoryIdStr := ctx.Param("id")
 
@@ -120,7 +131,7 @@ func CategoryQueryById(ctx *gin.Context) {
 	}
 
 	if exist {
-		userFollow, err := dao.UserFollowQuery(userId.(uint), uint(categoryId))
+		userFollow, err := dao.UserFollowQuery(authId.(uint), uint(categoryId))
 		if err != nil {
 			return
 		}
@@ -148,13 +159,13 @@ func CategoryQueryById(ctx *gin.Context) {
 
 func CategoryUpdate(ctx *gin.Context) {
 
-	adminId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 	if !exist {
 		return
 	}
 
-	valid, err := AdminCheckPerm(adminId.(uint), CodeCategoryPerm)
-	if err != nil || !valid {
+	valid, err := logic.UserCheckPerm(authId.(uint), logic.CodeCategoryPerm)
+	if err != nil || valid == 1 {
 		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
 		return
 	}
@@ -177,7 +188,7 @@ func CategoryUpdate(ctx *gin.Context) {
 		return
 	}
 
-	userId, err := strconv.ParseInt(cForm.UserId, 10, 32)
+	categoryerId, err := strconv.ParseInt(cForm.UserId, 10, 32)
 	if err != nil {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "用户id错误")
 		return
@@ -195,7 +206,7 @@ func CategoryUpdate(ctx *gin.Context) {
 		return
 	}
 
-	if err := dao.CategoryerSet(uint(userId), uint(categoryId), uint(categoryerType)); err != nil {
+	if err := dao.CategoryerSet(uint(categoryerId), uint(categoryId), uint(categoryerType)); err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
 
 		response.ResponseError(ctx, response.CodeUnknownError)
@@ -208,7 +219,7 @@ func CategoryUpdate(ctx *gin.Context) {
 
 func CategoryWiki(ctx *gin.Context) {
 
-	userId, exist := ctx.Get("userId")
+	authId, exist := ctx.Get("authId")
 	if !exist {
 		return
 	}
@@ -241,7 +252,7 @@ func CategoryWiki(ctx *gin.Context) {
 		return
 	}
 
-	valid, err := logic.CategoryerCheck(userId.(uint), uint(categoryId))
+	valid, err := logic.CategoryerCheck(authId.(uint), uint(categoryId))
 	if err != nil || !valid {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
 		return

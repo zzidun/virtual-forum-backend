@@ -1,7 +1,8 @@
 package dao
 
 import (
-	"go.uber.org/zap"
+	"fmt"
+
 	"golang.org/x/crypto/bcrypt"
 	"zzidun.tech/vforum0/model"
 )
@@ -10,7 +11,6 @@ func UserEmailReapetCheck(email string) (err error) {
 	db := DatabaseGet()
 	count := db.Where("email = ?", email).Find(&model.User{})
 	if count.Error != nil {
-		zap.L().Error("query user failed", zap.Error(count.Error))
 		err = ErrorQueryFailed
 		return
 	}
@@ -26,7 +26,6 @@ func UserNameReapetCheck(name string) (err error) {
 	count := db.Where("name = ?", name).Find(&model.User{})
 
 	if count.Error != nil {
-		zap.L().Error("query user failed", zap.Error(count.Error))
 		err = ErrorQueryFailed
 		return
 	}
@@ -38,36 +37,40 @@ func UserNameReapetCheck(name string) (err error) {
 }
 
 // 创建用户帐号，数据验证，加密密码
-func UserCreate(urform *model.UserRegisterForm) (err error) {
+func UserCreate(name string, emailOrigin string, passwordOrigin string) (user *model.User, err error) {
 
-	password, err := bcrypt.GenerateFromPassword([]byte(urform.Password), bcrypt.DefaultCost)
+	password, err := bcrypt.GenerateFromPassword([]byte(passwordOrigin), bcrypt.DefaultCost)
 	if err != nil {
-		zap.L().Error("gen password failed", zap.Error(err))
 		err = ErrorPasswordWrong
 		return
 	}
 
-	// 组装用户对象
-	user := model.User{
-		Name:     urform.Name,
-		Email:    urform.Email,
+	if err = UserNameReapetCheck(name); err != nil {
+		err = ErrorExistFailed
+		return
+	}
+
+	email, err := bcrypt.GenerateFromPassword([]byte(emailOrigin), bcrypt.DefaultCost)
+	if err != nil {
+		err = ErrorExistFailed
+		return
+	}
+
+	if err = UserEmailReapetCheck(string(email)); err != nil {
+		err = ErrorExistFailed
+		return
+	}
+
+	user = &model.User{
+		Name:     name,
+		Email:    string(email),
 		Password: string(password),
-	}
-
-	if err = UserNameReapetCheck(user.Name); err != nil {
-		zap.L().Error("insert user failed", zap.Error(err))
-		return
-	}
-
-	if err = UserEmailReapetCheck(user.Email); err != nil {
-		zap.L().Error("insert user failed", zap.Error(err))
-		return
+		Speak:    0,
 	}
 
 	db := DatabaseGet()
 	if err = db.Create(&user).Error; err != nil {
 		db.Rollback()
-		zap.L().Error("insert user failed", zap.Error(err))
 		err = ErrorInsertFailed
 		return
 	}
@@ -75,76 +78,75 @@ func UserCreate(urform *model.UserRegisterForm) (err error) {
 	return
 }
 
-func UserUpdate(userId uint, email string, password string, signal string) (err error) {
+func UserUpdate(userId uint, emailOrigin string, passwordOrigin string, signal string) (user *model.User, err error) {
 	db := DatabaseGet()
 
-	var user model.User
-	count := db.Where("id = ?", userId).Find(&user)
-
-	if count.Error != nil {
-		zap.L().Error("query user failed", zap.Error(err))
-		err = ErrorQueryFailed
-		return
-	}
-	if count.RowsAffected == 0 {
-		err = ErrorNotExistFailed
-		return
-	}
-
-	if err = UserEmailReapetCheck(email); err != nil {
-		zap.L().Error("insert user failed", zap.Error(err))
-		return
-	}
-
-	user.Email = email
-	user.Password = password
-	user.Signal = signal
-
-	if err = db.Save(&user).Error; err != nil {
-		db.Rollback()
-		zap.L().Error("update post speak count failed", zap.Error(err))
-		err = ErrorInsertFailed
-		return
-	}
-
-	return
-}
-
-func UserLogin(ulform *model.UserLoginForm) (id uint, err error) {
-
-	var user model.User
-
-	db := DatabaseGet()
-	count := db.Where("name = ?", ulform.Name).Find(&user)
-
-	if count.Error != nil {
-		zap.L().Error("query user failed", zap.Error(count.Error))
-		err = ErrorQueryFailed
-		return
-	}
-	if count.RowsAffected == 0 {
-		err = ErrorNotExistFailed
-		return
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(ulform.Password))
+	user, err = UserQueryById(userId)
 	if err != nil {
-		zap.L().Error("compare password failed", zap.Error(err))
+		return
+	}
+
+	password, err := bcrypt.GenerateFromPassword([]byte(passwordOrigin), bcrypt.DefaultCost)
+	if err != nil {
 		err = ErrorPasswordWrong
 		return
 	}
 
-	id = user.ID
+	email, err := bcrypt.GenerateFromPassword([]byte(emailOrigin), bcrypt.DefaultCost)
+	if err != nil {
+		err = ErrorExistFailed
+		return
+	}
+
+	if err = UserEmailReapetCheck(string(email)); err != nil {
+		err = ErrorExistFailed
+		return
+	}
+
+	user.Email = string(email)
+	user.Password = string(password)
+	user.Signal = signal
+
+	if err = db.Save(&user).Error; err != nil {
+		db.Rollback()
+		err = ErrorInsertFailed
+		return
+	}
+
 	return
 }
 
-func UserQueryById(userId uint) (user model.User, err error) {
+func UserLogin(name string, password string) (user *model.User, err error) {
+
+	db := DatabaseGet()
+	count := db.Where("name = ?", name).Find(&user)
+
+	fmt.Println(user)
+
+	if count.Error != nil {
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		err = ErrorNotExistFailed
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		err = ErrorPasswordWrong
+		return
+	}
+
+	return
+}
+
+func UserQueryById(userId uint) (user *model.User, err error) {
 
 	db := DatabaseGet()
 	count := db.Where("id = ?", userId).Find(&user)
 
 	if count.Error != nil {
-		zap.L().Error("query user failed", zap.Error(err))
 		err = ErrorQueryFailed
 		return
 	}

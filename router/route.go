@@ -91,7 +91,7 @@ func UserRoute(r *gin.Engine) *gin.Engine {
 	// 编辑用户信息
 	r.PUT("/users/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserUpdate)
 	// 屏蔽用户
-	r.PUT("/shields", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserShieldCreate)
+	r.POST("/shields", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserShieldCreate)
 	r.GET("/shields", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserShieldQuery)
 	r.GET("/shields/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserShieldQueryById)
 	r.DELETE("/shields/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserShieldDelete)

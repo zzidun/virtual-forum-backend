@@ -20,7 +20,7 @@ func CommentList(postId uint, left int, right int, userId uint) (commentList *gi
 		return
 	}
 
-	userShields, err := dao.UserShieldQueryByUser2(userId)
+	userShields, err := dao.UserShieldQueryByUser1(userId)
 	if err != nil {
 		return
 	}
@@ -30,7 +30,7 @@ func CommentList(postId uint, left int, right int, userId uint) (commentList *gi
 
 		flag := false
 		for _, userShield := range userShields {
-			if userShield.UserId == comment.UserId {
+			if userShield.ShieldUserId == comment.UserId {
 				flag = true
 				break
 			}

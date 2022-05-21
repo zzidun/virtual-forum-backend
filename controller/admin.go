@@ -46,30 +46,8 @@ func AdminCreate(ctx *gin.Context) {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
 		return
 	}
-	adminPerm, err := strconv.ParseInt(aForm.AdminPerm, 10, 32)
-	if err != nil {
-		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
-		return
-	}
-	banPerm, err := strconv.ParseInt(aForm.BanPerm, 10, 32)
-	if err != nil {
-		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
-		return
-	}
-	categoryPerm, err := strconv.ParseInt(aForm.CategoryPerm, 10, 32)
-	if err != nil {
-		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
-		return
-	}
 
-	admin, err := dao.AdminCreate(uint(userId))
-	if err != nil {
-		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
-		return
-	}
-
-	err = dao.AdminUpdate(admin.ID, uint(adminPerm), uint(banPerm), uint(categoryPerm))
-	if err != nil {
+	if _, err = dao.AdminCreate(uint(userId)); err != nil {
 		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
 		return
 	}

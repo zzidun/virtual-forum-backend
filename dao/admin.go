@@ -1,35 +1,15 @@
 package dao
 
 import (
-	"fmt"
-
 	"zzidun.tech/vforum0/model"
 )
-
-// 把管理员绑定到用户
-func AdminAsignUser(userId uint, adminId uint) (err error) {
-
-	user, err := UserQueryById(userId)
-	if err != nil {
-		return
-	}
-
-	user.AdminId = adminId
-
-	db := DatabaseGet()
-
-	if db.Save(user).Error != nil {
-		return ErrorUpdateFailed
-	}
-
-	return
-}
 
 // 创建管理员
 func AdminCreate(userId uint) (admin *model.Admin, err error) {
 
 	// 组装用户对象
 	admin = &model.Admin{
+		UserId:       userId,
 		AdminPerm:    0,
 		BanPerm:      0,
 		CategoryPerm: 0,
@@ -41,12 +21,19 @@ func AdminCreate(userId uint) (admin *model.Admin, err error) {
 		return
 	}
 
-	fmt.Println(*admin)
+	user, err := UserQueryById(userId)
+	if err != nil {
+		return
+	}
 
-	err = AdminAsignUser(userId, admin.ID)
+	user.AdminId = admin.ID
+
+	if db.Save(user).Error != nil {
+		err = ErrorUpdateFailed
+		return
+	}
 
 	return
-
 }
 
 // 取消管理员权限
@@ -98,15 +85,22 @@ func AdminUpdate(adminId uint, adminPerm uint, banPerm uint, categoryPerm uint) 
 	return
 }
 
-func AdminQuery() (admin []model.Admin, err error) {
+func AdminQuery(left int, right int) (adminList []model.Admin, totNum int64, curNum int64, err error) {
+	db := DatabaseGet()
+
+	count := db.Limit(right - left).Offset(left).Find(&adminList)
+
+	if count.Error != nil {
+		err = ErrorQueryFailed
+	}
+	curNum = count.RowsAffected
+	db.Model(&model.Admin{}).Count(&totNum)
 
 	return
 }
 
 func AdminQueryById(adminId uint) (admin *model.Admin, err error) {
 	db := DatabaseGet()
-
-	fmt.Println(adminId)
 
 	count := db.Where("id = ?", adminId).Find(&admin)
 

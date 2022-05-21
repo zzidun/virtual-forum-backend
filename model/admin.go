@@ -6,6 +6,7 @@ import "gorm.io/gorm"
 
 type Admin struct {
 	gorm.Model
+	UserId       uint `gorm:"not null"`
 	AdminPerm    uint `gorm:"not null"`
 	BanPerm      uint `gorm:"not null"`
 	CategoryPerm uint `gorm:"not null"`

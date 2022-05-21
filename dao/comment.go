@@ -41,10 +41,6 @@ func CommentDelete(commentId uint) (err error) {
 	return
 }
 
-func CommentQuery(commentIdLeft uint, commentIdRight uint) (err error) {
-	return
-}
-
 func CommentQueryById(commentId uint) (comment *model.Comment, err error) {
 
 	db := DatabaseGet()

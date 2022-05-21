@@ -103,6 +103,8 @@ func UserUpdate(userId uint, emailOrigin string, passwordOrigin string, signal s
 		return
 	}
 
+	// 检查邮箱todo
+
 	user.Email = string(email)
 	user.Password = string(password)
 	user.Signal = signal

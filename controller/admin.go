@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -244,11 +245,11 @@ func AdminQueryById(ctx *gin.Context) {
 	}
 
 	response.Response(ctx, response.CodeSuccess, gin.H{
-		"userid":       user.ID,
+		"userid":       fmt.Sprintf("%d", user.ID),
 		"userName":     user.Name,
-		"adminperm":    admin.AdminPerm,
-		"banperm":      admin.BanPerm,
-		"categoryperm": admin.CategoryPerm,
+		"adminperm":    fmt.Sprintf("%d", admin.AdminPerm),
+		"banperm":      fmt.Sprintf("%d", admin.BanPerm),
+		"categoryperm": fmt.Sprintf("%d", admin.CategoryPerm),
 	})
 
 	return

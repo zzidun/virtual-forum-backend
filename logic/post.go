@@ -30,6 +30,8 @@ func PostList(categoryId uint, left int, right int) (postList *gin.H, err error)
 			"id":    fmt.Sprintf("%d", post.ID),
 			"title": post.Title,
 			"speak": fmt.Sprintf("%d", post.Speak),
+			"ctime": post.CreatedAt,
+			"utime": post.UpdatedAt,
 			"user": &gin.H{
 				"id":    fmt.Sprintf("%d", user.ID),
 				"name":  user.Name,

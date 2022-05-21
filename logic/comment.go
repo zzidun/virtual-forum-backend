@@ -35,6 +35,7 @@ func CommentList(postId uint, left int, right int) (commentList *gin.H, err erro
 			"id":      fmt.Sprintf("%d", comment.ID),
 			"replyid": fmt.Sprintf("%d", comment.ReplyId),
 			"content": comment.Content,
+			"ctime":   comment.CreatedAt,
 			"user": &gin.H{
 				"id":    fmt.Sprintf("%d", user.ID),
 				"name":  user.Name,

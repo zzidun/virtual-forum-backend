@@ -6,22 +6,34 @@ import (
 	"zzidun.tech/vforum0/model"
 )
 
-func UserReapetCheck(name string, email string) (err error) {
+func UserEmailReapetCheck(email string) (err error) {
 	db := DatabaseGet()
-	count1 := db.Where("name = ?", name).Find(&model.User{})
-	count2 := db.Where("email = ?", email).Find(&model.User{})
-
-	if count1.Error != nil || count2.Error != nil {
-		zap.L().Error("query user failed", zap.Error(count1.Error))
-		zap.L().Error("query user failed", zap.Error(count2.Error))
+	count := db.Where("email = ?", email).Find(&model.User{})
+	if count.Error != nil {
+		zap.L().Error("query user failed", zap.Error(count.Error))
 		err = ErrorQueryFailed
 		return
 	}
-	if count1.RowsAffected != 0 || count2.RowsAffected != 0 {
+	if count.RowsAffected != 0 {
 		err = ErrorExistFailed
 		return
 	}
+	return
+}
 
+func UserNameReapetCheck(name string) (err error) {
+	db := DatabaseGet()
+	count := db.Where("name = ?", name).Find(&model.User{})
+
+	if count.Error != nil {
+		zap.L().Error("query user failed", zap.Error(count.Error))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected != 0 {
+		err = ErrorExistFailed
+		return
+	}
 	return
 }
 
@@ -42,7 +54,12 @@ func UserCreate(urform *model.UserRegisterForm) (err error) {
 		Password: string(password),
 	}
 
-	if err = UserReapetCheck(user.Name, user.Email); err != nil {
+	if err = UserNameReapetCheck(user.Name); err != nil {
+		zap.L().Error("insert user failed", zap.Error(err))
+		return
+	}
+
+	if err = UserEmailReapetCheck(user.Email); err != nil {
 		zap.L().Error("insert user failed", zap.Error(err))
 		return
 	}
@@ -51,6 +68,41 @@ func UserCreate(urform *model.UserRegisterForm) (err error) {
 	if err = db.Create(&user).Error; err != nil {
 		db.Rollback()
 		zap.L().Error("insert user failed", zap.Error(err))
+		err = ErrorInsertFailed
+		return
+	}
+
+	return
+}
+
+func UserUpdate(userId uint, email string, password string, signal string) (err error) {
+	db := DatabaseGet()
+
+	var user model.User
+	count := db.Where("id = ?", userId).Find(&user)
+
+	if count.Error != nil {
+		zap.L().Error("query user failed", zap.Error(err))
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		err = ErrorNotExistFailed
+		return
+	}
+
+	if err = UserEmailReapetCheck(email); err != nil {
+		zap.L().Error("insert user failed", zap.Error(err))
+		return
+	}
+
+	user.Email = email
+	user.Password = password
+	user.Signal = signal
+
+	if err = db.Save(&user).Error; err != nil {
+		db.Rollback()
+		zap.L().Error("update post speak count failed", zap.Error(err))
 		err = ErrorInsertFailed
 		return
 	}

@@ -49,7 +49,7 @@ type UserLoginForm struct {
 }
 
 type UserUpdateForm struct {
-	Name     string `json:"name" binding:"required"`
+	UserId   string `json:"userid" binding:"required"`
 	Email    string `json:"email" binging:"required"`
 	Password string `json:"password" binding:"required"`
 	Signal   string `json:"signal" binding:"required"`

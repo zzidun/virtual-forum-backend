@@ -111,6 +111,37 @@ func UserQuery(ctx *gin.Context) {
 }
 
 func UserUpdate(ctx *gin.Context) {
+
+	userId, exist := ctx.Get("userId")
+	if !exist {
+		return
+	}
+
+	var uuForm *model.UserUpdateForm
+	if err := ctx.ShouldBindJSON(&uuForm); err != nil {
+		// 请求参数有误，直接返回响应
+		zap.L().Error("SiginUp with invalid param", zap.Error(err))
+		// 判断err是不是 validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// 非validator.ValidationErrors类型错误直接返回
+			response.ResponseError(ctx, response.CodeInvalidParams) // 请求参数错误
+			return
+		}
+		// validator.ValidationErrors类型错误则进行翻译
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, errs)
+		return
+	}
+
+	if err := dao.UserUpdate(userId.(uint), uuForm.Email, uuForm.Password, uuForm.Signal); err != nil {
+		zap.L().Error("logic.signup failed", zap.Error(err))
+
+		response.ResponseError(ctx, response.CodeUnknownError)
+		return
+	}
+
+	response.ResponseSuccess(ctx, nil)
+
 	return
 }
 

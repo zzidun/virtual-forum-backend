@@ -89,7 +89,7 @@ func UserRoute(r *gin.Engine) *gin.Engine {
 	// 删除评论
 	r.DELETE("/comments/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.CommentDelete)
 	// 编辑用户信息
-	r.PUT("/users/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserInfoUpdate)
+	r.PUT("/users/:id", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserUpdate)
 	// 屏蔽用户
 	r.PUT("/shields", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserShieldCreate)
 	r.GET("/shields", middle.AuthMiddle(), middle.UserCheckMiddle(), controller.UserShieldQuery)

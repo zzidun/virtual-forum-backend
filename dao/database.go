@@ -87,9 +87,9 @@ func AdminInit() {
 }
 
 func rootConfig() (name string, email string, password string, err error) {
-	name = "root"
-	email = "root@zzidun.tech"
-	password = "password"
+	name = viper.Get("root.name").(string)
+	email = viper.Get("root.email").(string)
+	password = viper.Get("root.password").(string)
 
 	return
 }

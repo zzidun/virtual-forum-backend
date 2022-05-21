@@ -6,8 +6,10 @@
   "server" : {
     "port" : "8089"
   },
-  "browser" : {
-    "port" : "8080"
+  "root" : {
+    "name" : "root",
+    "email" : "root@zzidun.tech",
+    "password" : "password"
   },
   "data_source" : {
     "driver_name": "mysql",

@@ -13,16 +13,16 @@ import (
 var gDatebase *gorm.DB
 
 // 初始化数据库，建表
-func DatabaseInit() {
+func Init() {
 
 	// driverName := viper.Get("database.driver_name")
 
-	host := viper.Get("data_source.host")
-	port := viper.Get("data_source.port")
-	database := viper.Get("data_source.database")
-	username := viper.Get("data_source.username")
-	password := viper.Get("data_source.password")
-	charset := viper.Get("data_source.charset")
+	host := viper.Get("mysql.host")
+	port := viper.Get("mysql.port")
+	database := viper.Get("mysql.database")
+	username := viper.Get("mysql.username")
+	password := viper.Get("mysql.password")
+	charset := viper.Get("mysql.charset")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
 		username, password, host, port, database, charset)
 	log.Println(dsn)

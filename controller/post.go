@@ -155,7 +155,7 @@ func PostQueryReplyTime(ctx *gin.Context) {
 		return
 	}
 
-	postList, err := logic.PostList(uint(categoryId), int(left), int(right))
+	postList, err := logic.PostListReplyTime(uint(categoryId), int(left), int(right))
 	if err != nil {
 		response.Response(ctx, response.CodeUnknownError, nil)
 		return
@@ -184,8 +184,10 @@ func PostQueryById(ctx *gin.Context) {
 	}
 
 	response.Response(ctx, response.CodeSuccess, gin.H{
-		"title": post.Title,
-		"speak": fmt.Sprintf("%d", post.Speak),
+		"id":       fmt.Sprintf("%d", post.ID),
+		"title":    post.Title,
+		"speak":    fmt.Sprintf("%d", post.Speak),
+		"category": fmt.Sprintf("%d", post.CategoryId),
 	})
 
 	return

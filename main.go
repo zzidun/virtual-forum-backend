@@ -11,8 +11,11 @@ import (
 func main() {
 	// 不取消注释,将会是Debug模式
 	// gin.SetMode(gin.ReleaseMode)
-	util.Config_Init()
-	dao.DatabaseInit()
+	util.ConfigInit()
+	dao.Init()
+	// if err := redis.Init(); err != nil {
+	// 	return
+	// }
 	r := gin.Default()
 	r = router.RouteInit(r)
 	port := viper.GetString("server.port")

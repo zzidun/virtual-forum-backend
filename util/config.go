@@ -5,7 +5,7 @@ import (
 )
 
 // 初始化配置文件
-func Config_Init() {
+func ConfigInit() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	viper.AddConfigPath(".")

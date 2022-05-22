@@ -1,6 +1,5 @@
 {
   "secret" : {
-    "key" : "deep_dark_fantastic",
     "expire" : 8760
   },
   "server" : {
@@ -11,7 +10,7 @@
     "email" : "root@zzidun.tech",
     "password" : "password"
   },
-  "data_source" : {
+  "mysql" : {
     "driver_name": "mysql",
     "host": "127.0.0.1",
     "port": "3306",
@@ -19,6 +18,13 @@
     "username": "zzidun",
     "password": "feather0",
     "charset": "utf8"
+  },
+  "redis" : {
+    "host": "127.0.0.1",
+    "port" : 6379,
+    "password" : "",
+    "database" : 0,
+    "poolsize" : 100
   },
   "about" : "# virutal forum 论坛正式版 \r\n 如有bug或建议可以发完作者邮箱或者反馈版块 \r\n 项目仓库:[前端](https://github.com/zzidun/virtual-forum-frontend-0), [后端](https://github.com/zzidun/virtual-forum-endback-0)"
 }

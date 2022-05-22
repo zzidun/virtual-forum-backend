@@ -65,7 +65,7 @@ func CategoryDelete(categoryId uint) (err error) {
 		return
 	}
 
-	if err = db.Delete(&category).Error; err != nil {
+	if err = db.Unscoped().Delete(&category).Error; err != nil {
 		err = ErrorDeleteFailed
 		return
 	}

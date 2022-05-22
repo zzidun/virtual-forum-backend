@@ -96,7 +96,7 @@ func CategoryQuery(ctx *gin.Context) {
 
 	left, err := strconv.ParseInt(leftStr, 10, 32)
 	if err != nil {
-		left = 1
+		left = 0
 	}
 
 	right, err := strconv.ParseInt(rightStr, 10, 32)

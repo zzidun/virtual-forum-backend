@@ -54,9 +54,10 @@ type UserLoginForm struct {
 }
 
 type UserUpdateForm struct {
-	UserId   string `json:"userid" binding:"required"`
 	Email    string `json:"email" binging:"required"`
 	Password string `json:"password" binding:"required"`
+	EmailOld    string `json:"emailold" binging:"required"`
+	PasswordOld string `json:"passwordold" binding:"required"`
 	Signal   string `json:"signal" binding:"required"`
 }
 

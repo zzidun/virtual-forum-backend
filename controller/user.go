@@ -136,6 +136,14 @@ func UserUpdate(ctx *gin.Context) {
 		return
 	}
 
+	userIdStr := ctx.Param("id")
+
+	userId, err := strconv.ParseInt(userIdStr, 10, 32)
+	if err != nil {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
 	var uuForm *model.UserUpdateForm
 	if err := ctx.ShouldBindJSON(&uuForm); err != nil {
 		// 请求参数有误，直接返回响应
@@ -152,7 +160,13 @@ func UserUpdate(ctx *gin.Context) {
 		return
 	}
 
-	_, err := dao.UserUpdate(authId.(uint), uuForm.Email, uuForm.Password, uuForm.Signal)
+	if authId.(uint) != uint(userId) {
+		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+		return
+	}
+
+	_, err = dao.UserUpdate(authId.(uint), uuForm.Email, uuForm.Password, uuForm.Signal,
+		uuForm.EmailOld, uuForm.PasswordOld)
 
 	if err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))

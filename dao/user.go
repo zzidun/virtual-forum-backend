@@ -78,13 +78,59 @@ func UserCreate(name string, emailOrigin string, passwordOrigin string) (user *m
 	return
 }
 
-func UserUpdate(userId uint, emailOrigin string, passwordOrigin string, signal string) (user *model.User, err error) {
+// 创建用户帐号，数据验证
+func UserCreateWithBcrypted(name string, email string, password string) (user *model.User, err error) {
+
+	if err = UserNameReapetCheck(name); err != nil {
+		err = ErrorExistFailed
+		return
+	}
+
+	if err = UserEmailReapetCheck(string(email)); err != nil {
+		err = ErrorExistFailed
+		return
+	}
+
+	user = &model.User{
+		Name:     name,
+		Email:    string(email),
+		Password: string(password),
+		Speak:    0,
+	}
+
+	db := DatabaseGet()
+	if err = db.Create(&user).Error; err != nil {
+		db.Rollback()
+		err = ErrorInsertFailed
+		return
+	}
+
+	return
+}
+
+func UserUpdate(userId uint, emailOrigin string, passwordOrigin string, signal string,
+	emailOriginOld string, passwordOriginOld string) (user *model.User, err error) {
+
 	db := DatabaseGet()
 
 	user, err = UserQueryById(userId)
 	if err != nil {
 		return
 	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(passwordOriginOld))
+	if err != nil {
+		err = ErrorPasswordWrong
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Email), []byte(emailOriginOld))
+	if err != nil {
+		err = ErrorPasswordWrong
+		return
+	}
+
+	fmt.Println(user)
 
 	password, err := bcrypt.GenerateFromPassword([]byte(passwordOrigin), bcrypt.DefaultCost)
 	if err != nil {
@@ -103,7 +149,40 @@ func UserUpdate(userId uint, emailOrigin string, passwordOrigin string, signal s
 		return
 	}
 
-	// 检查邮箱todo
+	user.Email = string(email)
+	user.Password = string(password)
+	user.Signal = signal
+
+	if err = db.Save(&user).Error; err != nil {
+		db.Rollback()
+		err = ErrorInsertFailed
+		return
+	}
+
+	return
+}
+
+func UserUpdateWithBcrypted(userId uint, email string, password string, signal string,
+	emailOld string, passwordOld string) (user *model.User, err error) {
+
+	db := DatabaseGet()
+
+	user, err = UserQueryById(userId)
+	if err != nil {
+		return
+	}
+
+	if emailOld != user.Email || passwordOld != user.Password {
+		err = ErrorPasswordWrong
+		return
+	}
+
+	fmt.Println(user)
+
+	if err = UserEmailReapetCheck(string(email)); err != nil {
+		err = ErrorExistFailed
+		return
+	}
 
 	user.Email = string(email)
 	user.Password = string(password)
@@ -136,6 +215,30 @@ func UserLogin(name string, password string) (user *model.User, err error) {
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
+		err = ErrorPasswordWrong
+		return
+	}
+
+	return
+}
+
+func UserLoginWithBcrypted(name string, password string) (user *model.User, err error) {
+
+	db := DatabaseGet()
+	count := db.Where("name = ?", name).Find(&user)
+
+	fmt.Println(user)
+
+	if count.Error != nil {
+		err = ErrorQueryFailed
+		return
+	}
+	if count.RowsAffected == 0 {
+		err = ErrorNotExistFailed
+		return
+	}
+
+	if user.Password != password {
 		err = ErrorPasswordWrong
 		return
 	}

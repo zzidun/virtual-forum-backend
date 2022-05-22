@@ -17,6 +17,6 @@ type Admin struct {
 type AdminForm struct {
 	UserId       string `json:"userid" binding:"required"`
 	AdminPerm    string `json:"adminperm" binding:"required"`
-	BanPerm      string `json:"banperm" binding:"required"`
+	// BanPerm      string `json:"banperm" binding:"required"`
 	CategoryPerm string `json:"categoryperm" binding:"required"`
 }

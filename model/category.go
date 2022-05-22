@@ -16,7 +16,6 @@ type Categoryer struct {
 	gorm.Model
 	Category   *Category
 	CategoryId uint `gorm:"not null"`
-	User       *User
 	UserId     uint `gorm:"not null"`
 	Type       uint `gorm:"type:bool;not null"`
 }

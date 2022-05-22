@@ -128,11 +128,11 @@ func AdminUpdate(ctx *gin.Context) {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
 		return
 	}
-	banPerm, err := strconv.ParseInt(aForm.BanPerm, 10, 32)
-	if err != nil {
-		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
-		return
-	}
+	// banPerm, err := strconv.ParseInt(aForm.BanPerm, 10, 32)
+	// if err != nil {
+	// 	response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
+	// 	return
+	// }
 	categoryPerm, err := strconv.ParseInt(aForm.CategoryPerm, 10, 32)
 	if err != nil {
 		response.ResponseErrorWithMsg(ctx, response.CodeInvalidParams, "版块id错误")
@@ -141,7 +141,7 @@ func AdminUpdate(ctx *gin.Context) {
 
 	user, err := dao.UserQueryById(uint(userId))
 
-	err = dao.AdminUpdate(user.AdminId, uint(adminPerm), uint(banPerm), uint(categoryPerm))
+	err = dao.AdminUpdate(user.AdminId, uint(adminPerm), uint(0), uint(categoryPerm))
 	if err != nil {
 		response.ResponseErrorWithMsg(ctx, response.CodeUnknownError, nil)
 		return

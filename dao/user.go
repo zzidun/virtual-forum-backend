@@ -37,7 +37,7 @@ func UserNameReapetCheck(name string) (err error) {
 }
 
 // 创建用户帐号，数据验证，加密密码
-func UserCreate(name string, emailOrigin string, passwordOrigin string) (user *model.User, err error) {
+func UserCreate(name string, email string, passwordOrigin string) (user *model.User, err error) {
 
 	password, err := bcrypt.GenerateFromPassword([]byte(passwordOrigin), bcrypt.DefaultCost)
 	if err != nil {
@@ -50,13 +50,7 @@ func UserCreate(name string, emailOrigin string, passwordOrigin string) (user *m
 		return
 	}
 
-	email, err := bcrypt.GenerateFromPassword([]byte(emailOrigin), bcrypt.DefaultCost)
-	if err != nil {
-		err = ErrorExistFailed
-		return
-	}
-
-	if err = UserEmailReapetCheck(string(email)); err != nil {
+	if err = UserEmailReapetCheck(email); err != nil {
 		err = ErrorExistFailed
 		return
 	}
@@ -108,8 +102,8 @@ func UserCreateWithBcrypted(name string, email string, password string) (user *m
 	return
 }
 
-func UserUpdate(userId uint, emailOrigin string, passwordOrigin string, signal string,
-	emailOriginOld string, passwordOriginOld string) (user *model.User, err error) {
+func UserUpdate(userId uint, email string, passwordOrigin string, signal string, 
+	passwordOriginOld string) (user *model.User, err error) {
 
 	db := DatabaseGet()
 
@@ -124,23 +118,11 @@ func UserUpdate(userId uint, emailOrigin string, passwordOrigin string, signal s
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Email), []byte(emailOriginOld))
-	if err != nil {
-		err = ErrorPasswordWrong
-		return
-	}
-
 	fmt.Println(user)
 
 	password, err := bcrypt.GenerateFromPassword([]byte(passwordOrigin), bcrypt.DefaultCost)
 	if err != nil {
 		err = ErrorPasswordWrong
-		return
-	}
-
-	email, err := bcrypt.GenerateFromPassword([]byte(emailOrigin), bcrypt.DefaultCost)
-	if err != nil {
-		err = ErrorExistFailed
 		return
 	}
 
@@ -197,10 +179,10 @@ func UserUpdateWithBcrypted(userId uint, email string, password string, signal s
 	return
 }
 
-func UserLogin(name string, password string) (user *model.User, err error) {
+func UserLogin(email string, password string) (user *model.User, err error) {
 
 	db := DatabaseGet()
-	count := db.Where("name = ?", name).Find(&user)
+	count := db.Where("email = ?", email).Find(&user)
 
 	fmt.Println(user)
 

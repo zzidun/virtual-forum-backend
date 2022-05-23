@@ -49,16 +49,15 @@ type UserRegisterForm struct {
 }
 
 type UserLoginForm struct {
-	Name     string `json:"name" binding:"required"`
+	Email     string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 type UserUpdateForm struct {
 	Email    string `json:"email" binging:"required"`
 	Password string `json:"password" binding:"required"`
-	EmailOld    string `json:"emailold" binging:"required"`
-	PasswordOld string `json:"passwordold" binding:"required"`
 	Signal   string `json:"signal" binding:"required"`
+	PasswordOld string `json:"passwordold" binding:"required"`
 }
 
 type UserShieldForm struct {

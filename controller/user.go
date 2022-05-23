@@ -61,7 +61,7 @@ func UserLogin(ctx *gin.Context) {
 		return
 	}
 
-	user, err := dao.UserLogin(ulForm.Name, ulForm.Password)
+	user, err := dao.UserLogin(ulForm.Email, ulForm.Password)
 	if err != nil {
 		response.ResponseError(ctx, response.CodeUnknownError)
 		return
@@ -166,7 +166,7 @@ func UserUpdate(ctx *gin.Context) {
 	}
 
 	_, err = dao.UserUpdate(authId.(uint), uuForm.Email, uuForm.Password, uuForm.Signal,
-		uuForm.EmailOld, uuForm.PasswordOld)
+		uuForm.PasswordOld)
 
 	if err != nil {
 		zap.L().Error("logic.signup failed", zap.Error(err))
